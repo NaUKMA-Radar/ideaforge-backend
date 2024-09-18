@@ -1,0 +1,96 @@
+services:
+  backend:
+    image: barkas/ideaforge:backend
+    platform: linux/amd64
+    build:
+      dockerfile: Dockerfile.development
+    container_name: ideaforge-backend
+    networks:
+      - ideaforge-network
+    env_file:
+      - ./env/.env.development
+    ports:
+      - 8000:${DOCKER_INTERNAL_BACKEND_PORT}
+    volumes:
+      - ./src:/app/src
+    depends_on:
+      database:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+    restart: on-failure
+
+  database:
+    image: barkas/ideaforge:database
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM postgres:latest
+    container_name: ideaforge-database
+    networks:
+      - ideaforge-network
+    env_file:
+      - ./env/.env.development
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    ports:
+      - ${DOCKER_INTERNAL_DATABASE_PORT}
+    expose:
+      - ${DOCKER_INTERNAL_DATABASE_PORT}
+    volumes:
+      - ideaforge-database-volume:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    healthcheck:
+      test: ['CMD-SHELL', "sh -c 'pg_isready -U ${DATABASE_USERNAME} -d ${DATABASE_NAME}'"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    restart: on-failure
+
+  nginx:
+    image: barkas/ideaforge:nginx
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM nginx:latest
+    container_name: ideaforge-nginx
+    networks:
+      - ideaforge-network
+    env_file: ./env/.env.development
+    ports:
+      - 80:${DOCKER_INTERNAL_NGINX_PORT}
+      - 443:${DOCKER_INTERNAL_NGINX_SSL_PORT}
+    volumes:
+      - ./nginx/default.development.conf:/etc/nginx/conf.d/default.conf
+    expose:
+      - ${DOCKER_INTERNAL_NGINX_PORT}
+      - ${DOCKER_INTERNAL_NGINX_SSL_PORT}
+    depends_on:
+      backend:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    healthcheck:
+      test: ['CMD-SHELL', 'service nginx status || exit 1']
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    restart: on-failure
+
+networks:
+  ideaforge-network:
+    driver: bridge
+
+volumes:
+  ideaforge-database-volume:
