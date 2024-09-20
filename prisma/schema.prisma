@@ -5,10 +5,268 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id                       String   @id @default(uuid()) @db.Uuid
+  email                    String   @unique @db.VarChar(50)
+  password                 String?  @db.Text
+  firstName                String?  @db.VarChar(50)
+  lastName                 String?  @db.VarChar(50)
+  image                    String?  @db.Text
+  userRegistrationMethodId Int      @db.SmallInt
+  createdAt                DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt                DateTime @updatedAt @db.Timestamptz(6)
+
+  userRegistrationMethod   UserRegistrationMethod    @relation(fields: [userRegistrationMethodId], references: [id], onDelete: NoAction, onUpdate: Cascade)
+  usersToProjects          UserToProject[]
+  usersToStages            UserToStage[]
+  usersToDocuments         UserToDocument[]
+  paragraphComments        ParagraphComment[]
+  paragraphGrades          ParagraphGrade[]
+  paragraphEditionComments ParagraphEditionComment[]
+  paragraphEditionGrades   ParagraphEditionGrade[]
+
+  @@index([email])
+}
+
+model UserRegistrationMethod {
+  id        Int      @id @default(autoincrement()) @db.SmallInt
+  name      String   @unique @db.VarChar(50)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  users User[]
+
+  @@index([name])
+}
+
+model UserRole {
+  id        Int      @id @default(autoincrement()) @db.SmallInt
+  name      String   @unique @db.VarChar(50)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  usersToProjects  UserToProject[]
+  usersToStages    UserToStage[]
+  usersToDocuments UserToDocument[]
+
+  @@index([name])
+}
+
+model UserToProject {
+  userId     String   @db.Uuid
+  projectId  String   @db.Uuid
+  userRoleId Int      @db.SmallInt
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(6)
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  project  Project  @relation(fields: [projectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userRole UserRole @relation(fields: [userRoleId], references: [id], onDelete: NoAction, onUpdate: Cascade)
+
+  @@id([userId, projectId])
+  @@index([userRoleId])
+}
+
+model UserToStage {
+  userId     String   @db.Uuid
+  stageId    String   @db.Uuid
+  userRoleId Int      @db.SmallInt
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(6)
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  stage    Stage    @relation(fields: [stageId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userRole UserRole @relation(fields: [userRoleId], references: [id], onDelete: NoAction, onUpdate: Cascade)
+
+  @@id([userId, stageId])
+  @@index([userRoleId])
+}
+
+model UserToDocument {
+  userId     String   @db.Uuid
+  documentId String   @db.Uuid
+  userRoleId Int      @db.SmallInt
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(6)
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userRole UserRole @relation(fields: [userRoleId], references: [id], onDelete: NoAction, onUpdate: Cascade)
+
+  @@id([userId, documentId])
+  @@index([userRoleId])
+}
+
+model Project {
+  id               String   @id @default(uuid()) @db.Uuid
+  name             String   @db.VarChar(50)
+  url              String   @db.Text
+  socialMediaLinks Json     @db.JsonB
+  description      String   @db.Text
+  image            String?  @db.Text
+  createdAt        DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt        DateTime @updatedAt @db.Timestamptz(6)
+
+  usersToProjects UserToProject[]
+  stages          Stage[]
+
+  @@unique([name, url])
+  @@index([name, url])
+}
+
+model Stage {
+  id          String   @id @default(uuid()) @db.Uuid
+  projectId   String   @db.Uuid
+  stageTypeId Int      @db.SmallInt
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(6)
+
+  project       Project       @relation(fields: [projectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  stageType     StageType     @relation(fields: [stageTypeId], references: [id], onDelete: NoAction, onUpdate: Cascade)
+  usersToStages UserToStage[]
+  documents     Document[]
+
+  @@unique([projectId, stageTypeId])
+  @@index([projectId, stageTypeId])
+}
+
+model StageType {
+  id        Int      @id @default(autoincrement()) @db.SmallInt
+  name      String   @unique @db.VarChar(50)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  stages Stage[]
+
+  @@index([name])
+}
+
+model Document {
+  id             String   @id @default(uuid()) @db.Uuid
+  stageId        String   @db.Uuid
+  documentTypeId Int      @db.SmallInt
+  isFinalized    Boolean  @default(false) @db.Boolean
+  initialData    Json     @default("{}") @db.Json
+  createdAt      DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime @updatedAt @db.Timestamptz(6)
+
+  stage            Stage            @relation(fields: [stageId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  documentType     DocumentType     @relation(fields: [documentTypeId], references: [id], onDelete: NoAction, onUpdate: Cascade)
+  usersToDocuments UserToDocument[]
+  paragraphs       Paragraph[]
+
+  @@index([stageId, documentTypeId, isFinalized])
+}
+
+model DocumentType {
+  id        Int      @id @default(autoincrement()) @db.SmallInt
+  name      String   @unique @db.VarChar(50)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  document Document[]
+
+  @@index([name])
+}
+
+model Paragraph {
+  id         String   @id @default(uuid()) @db.Uuid
+  documentId String   @db.Uuid
+  content    String   @db.Text
+  ordinalId  Int      @db.SmallInt
+  isApproved Boolean  @default(false) @db.Boolean
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(6)
+
+  document          Document           @relation(fields: [documentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  paragraphEditions ParagraphEdition[]
+  paragraphComments ParagraphComment[]
+  paragraphGrades   ParagraphGrade[]
+
+  @@index([documentId, isApproved])
+}
+
+model ParagraphComment {
+  id                        String   @id @default(uuid()) @db.Uuid
+  paragraphId               String   @db.Uuid
+  authorId                  String   @db.Uuid
+  replyToParagraphCommentId String?  @db.Uuid
+  content                   String   @db.Text
+  createdAt                 DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt                 DateTime @updatedAt @db.Timestamptz(6)
+
+  paragraph               Paragraph          @relation(fields: [paragraphId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  author                  User               @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  replyToParagraphComment ParagraphComment?  @relation("ParrentParagraphComment", fields: [replyToParagraphCommentId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  paragraphComments       ParagraphComment[] @relation("ParrentParagraphComment")
+
+  @@index([paragraphId])
+}
+
+model ParagraphGrade {
+  paragraphId String   @db.Uuid
+  userId      String   @db.Uuid
+  grade       Int      @db.SmallInt
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(6)
+
+  paragraph Paragraph @relation(fields: [paragraphId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([paragraphId, userId])
+  @@index([grade])
+}
+
+model ParagraphEdition {
+  id          String   @id @default(uuid()) @db.Uuid
+  paragraphId String   @db.Uuid
+  content     String   @db.Text
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(6)
+
+  paragraph                Paragraph                 @relation(fields: [paragraphId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  paragraphEditionComments ParagraphEditionComment[]
+  paragraphEditionGrades   ParagraphEditionGrade[]
+
+  @@index([paragraphId])
+}
+
+model ParagraphEditionComment {
+  id                               String   @id @default(uuid()) @db.Uuid
+  paragraphEditionId               String   @db.Uuid
+  authorId                         String   @db.Uuid
+  replyToParagraphEditionCommentId String?  @db.Uuid
+  content                          String   @db.Text
+  createdAt                        DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt                        DateTime @updatedAt @db.Timestamptz(6)
+
+  paragraphEdition               ParagraphEdition          @relation(fields: [paragraphEditionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  author                         User                      @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  replyToParagraphEditionComment ParagraphEditionComment?  @relation("ParrentParagraphEditionComment", fields: [replyToParagraphEditionCommentId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  paragraphEditionComments       ParagraphEditionComment[] @relation("ParrentParagraphEditionComment")
+
+  @@index([paragraphEditionId])
+}
+
+model ParagraphEditionGrade {
+  paragraphEditionId String   @db.Uuid
+  userId             String   @db.Uuid
+  grade              Int      @db.SmallInt
+  createdAt          DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime @updatedAt @db.Timestamptz(6)
+
+  paragraphEdition ParagraphEdition @relation(fields: [paragraphEditionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([paragraphEditionId, userId])
+  @@index([grade])
 }
