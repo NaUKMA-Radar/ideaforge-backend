@@ -15,6 +15,7 @@ services:
         DATABASE_PASSWORD: ${DATABASE_PASSWORD}
         DATABASE_NAME: ${DATABASE_NAME}
         DATABASE_PORT: ${DATABASE_PORT}
+        DATABASE_URL: ${DATABASE_URL}
         COOKIE_ACCESS_TOKEN_NAME: ${COOKIE_ACCESS_TOKEN_NAME}
         COOKIE_REFRESH_TOKEN_NAME: ${COOKIE_REFRESH_TOKEN_NAME}
         COOKIE_OAUTH2_TOKEN_NAME: ${COOKIE_OAUTH2_TOKEN_NAME}
@@ -40,6 +41,8 @@ services:
       - 8000:${DOCKER_INTERNAL_BACKEND_PORT}
     volumes:
       - ./src:/app/src
+      - ./prisma/migrations:/app/prisma/migrations
+      - ./prisma/seeders:/app/prisma/seeders
     depends_on:
       database:
         condition: service_healthy
