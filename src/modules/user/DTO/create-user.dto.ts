@@ -5,6 +5,7 @@ import {
   IsNotEmpty,
   IsNumber,
   IsString,
+  Matches,
   MaxLength,
   Min,
   ValidateIf,
@@ -12,7 +13,9 @@ import {
 import { UserEntity } from 'src/modules/user/entities/user.entity';
 
 export class CreateUserDto
-  implements Pick<UserEntity, 'userRegistrationMethodId' | 'email' | 'password'>
+  implements
+    Pick<UserEntity, 'userRegistrationMethodId' | 'email'>,
+    Pick<Partial<UserEntity>, 'firstName' | 'lastName' | 'password' | 'image'>
 {
   @ApiProperty({
     description: 'User registration method id',
@@ -24,6 +27,32 @@ export class CreateUserDto
   @IsNotEmpty()
   @IsDefined()
   userRegistrationMethodId: number;
+
+  @ApiProperty({
+    description: 'The first name of the user',
+    examples: ['Petro', 'Oleksandr', 'Illia', 'Nadiia', 'Kyrylo'],
+    default: 'Petro',
+  })
+  @Matches(/^[\p{Letter}\p{Mark}\- ]+$/gu)
+  @MaxLength(50)
+  @IsString()
+  @IsNotEmpty()
+  @IsDefined()
+  @ValidateIf((_, value) => value)
+  firstName?: string | null;
+
+  @ApiProperty({
+    description: 'The last name of the user',
+    examples: ['Yaremenko', 'Igumnov', 'Biloverbenko', 'Yemets', 'Gorokhovsky'],
+    default: 'Igumnov',
+  })
+  @Matches(/^[\p{Letter}\p{Mark}\- ]+$/gu)
+  @MaxLength(50)
+  @IsString()
+  @IsNotEmpty()
+  @IsDefined()
+  @ValidateIf((_, value) => value)
+  lastName?: string | null;
 
   @ApiProperty({
     description: 'The email of the user',
@@ -54,5 +83,5 @@ export class CreateUserDto
   @IsNotEmpty()
   @IsDefined()
   @ValidateIf((_, value) => value)
-  password: string | null;
+  password?: string | null;
 }

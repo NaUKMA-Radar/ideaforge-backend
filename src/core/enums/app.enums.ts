@@ -16,3 +16,7 @@ export enum UserRegistrationMethods {
   Credentials = 'credentials',
   Google = 'google',
 }
+
+export enum Routes {
+  Users = 'users',
+}

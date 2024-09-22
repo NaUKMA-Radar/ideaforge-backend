@@ -6,6 +6,10 @@ import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { CreateUserDto } from 'src/modules/user/DTO/create-user.dto';
 import { UpdateUserDto } from 'src/modules/user/DTO/update-user.dto';
 import { UserPublicEntity } from 'src/modules/user/entities/user-public.entity';
+import {
+  CreateUserUploadedFiles,
+  UpdateUserUploadedFiles,
+} from 'src/modules/user/types/user.types';
 
 @Injectable()
 export class UserService {
@@ -26,7 +30,10 @@ export class UserService {
     );
   }
 
-  public async create(data: CreateUserDto): Promise<UserPublicEntity> {
+  public async create(
+    data: CreateUserDto,
+    files?: CreateUserUploadedFiles,
+  ): Promise<UserPublicEntity> {
     if (data.password) {
       data.password = await this.passwordService.hash(data.password);
     }
@@ -34,7 +41,11 @@ export class UserService {
     return this.prismaService.user.create({ data, omit: { password: true, refreshToken: true } });
   }
 
-  public async update(id: string, data: UpdateUserDto): Promise<UserPublicEntity> {
+  public async update(
+    id: string,
+    data: UpdateUserDto,
+    files?: UpdateUserUploadedFiles,
+  ): Promise<UserPublicEntity> {
     if (data.password) {
       data.password = await this.passwordService.hash(data.password);
     }

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
-import { ConfigVariables } from 'src/core/utils/contstants';
+import { ConfigVariables } from 'src/core/enums/app.enums';
 import { PasswordModule } from 'src/modules/password/password.module';
 import { PasswordModuleOptions } from 'src/modules/password/types/password.types';
 import { PrismaModule } from 'src/modules/prisma/prisma.module';
