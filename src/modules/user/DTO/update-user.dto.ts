@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsDefined,
   IsEmail,
@@ -12,7 +13,10 @@ import { UserEntity } from 'src/modules/user/entities/user.entity';
 
 export class UpdateUserDto
   implements
-    Pick<Partial<UserEntity>, 'firstName' | 'lastName' | 'email' | 'password' | 'refreshToken'>
+    Pick<
+      Partial<UserEntity>,
+      'firstName' | 'lastName' | 'email' | 'image' | 'password' | 'refreshToken'
+    >
 {
   @ApiProperty({
     description: 'The first name of the user',
@@ -25,7 +29,7 @@ export class UpdateUserDto
   @IsNotEmpty()
   @IsDefined()
   @ValidateIf((_, value) => value)
-  firstName: string | null;
+  firstName?: string | null;
 
   @ApiProperty({
     description: 'The last name of the user',
@@ -38,7 +42,7 @@ export class UpdateUserDto
   @IsNotEmpty()
   @IsDefined()
   @ValidateIf((_, value) => value)
-  lastName: string | null;
+  lastName?: string | null;
 
   @ApiProperty({
     description: 'The email of the user',
@@ -55,7 +59,12 @@ export class UpdateUserDto
   @IsEmail()
   @IsNotEmpty()
   @IsDefined()
-  email: string;
+  email?: string;
+
+  @ApiProperty({ description: 'The path to the image of the user' })
+  @IsString()
+  @ValidateIf((_, value) => value)
+  image?: string | null;
 
   @ApiProperty({
     description: 'The password of the user',
@@ -69,12 +78,7 @@ export class UpdateUserDto
   @IsNotEmpty()
   @IsDefined()
   @ValidateIf((_, value) => value)
-  password: string | null;
-
-  @ApiProperty({ description: 'The path to the image of the user' })
-  @IsString()
-  @ValidateIf((_, value) => value)
-  image: string | null;
+  password?: string | null;
 
   @ApiProperty({
     description: 'The refresh token of the user',
@@ -88,5 +92,5 @@ export class UpdateUserDto
   })
   @IsString()
   @ValidateIf((_, value) => value)
-  refreshToken: string | null;
+  refreshToken?: string | null;
 }

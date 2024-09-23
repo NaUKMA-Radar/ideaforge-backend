@@ -39,9 +39,9 @@ export class PasswordModule {
         {
           provide: PasswordService,
           useFactory: async (...args: any[]): Promise<PasswordService> => {
-            const config = await options.useFactory(...args);
+            const config = await options.useFactory?.(...args);
 
-            return new PasswordService(config);
+            return new PasswordService(config || { saltPrefix: '', saltSuffix: '', saltRounds: 0 });
           },
           inject: options.inject || [],
         },

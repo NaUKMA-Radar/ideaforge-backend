@@ -18,9 +18,3 @@ export interface PasswordModuleAsyncOptions {
   inject?: any[];
   extraProviders?: Provider[];
 }
-
-export enum PasswordServiceDependencies {
-  SaltPrefix = 'SaltPrefix',
-  SaltSuffix = 'SaltSuffix',
-  SaltRounds = 'SaltRounds',
-}

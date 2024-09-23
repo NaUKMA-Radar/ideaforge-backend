@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import qs from 'qs';
+import * as qs from 'qs';
 import { BooleanOptional, IParseOptions } from 'qs';
 
 export const parseObjectStringValuesToPrimitives = (

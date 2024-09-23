@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsDefined,
   IsEmail,
@@ -26,6 +27,7 @@ export class CreateUserDto
   @IsNumber()
   @IsNotEmpty()
   @IsDefined()
+  @Transform(field => Number(field.value))
   userRegistrationMethodId: number;
 
   @ApiProperty({

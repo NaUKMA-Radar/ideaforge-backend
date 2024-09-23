@@ -2,11 +2,8 @@ import {
   Body,
   Controller,
   Delete,
-  FileTypeValidator,
   Get,
-  MaxFileSizeValidator,
   Param,
-  ParseFilePipe,
   Post,
   Put,
   Query,
@@ -37,6 +34,9 @@ import {
   CreateUserUploadedFiles,
   UpdateUserUploadedFiles,
 } from 'src/modules/user/types/user.types';
+import * as _ from 'lodash';
+import { UploadRestrictions } from 'src/core/decorators/upload-restrictions.decorator';
+import { Request } from 'express';
 
 @ApiTags(RoutesApiTags[Routes.Users])
 @Controller(Routes.Users)
@@ -53,14 +53,8 @@ export class UserController {
   @Post()
   public async create(
     @Body() createUserDto: CreateUserDto,
-    @UploadedFiles(
-      new ParseFilePipe({
-        validators: [
-          new MaxFileSizeValidator({ maxSize: 50 * 1024 * 1024 }),
-          new FileTypeValidator({ fileType: 'image/*' }),
-        ],
-      }),
-    )
+    @UploadedFiles()
+    @UploadRestrictions([{ fieldname: 'image', minFileSize: 1 }])
     files: CreateUserUploadedFiles,
   ): Promise<UserPublicEntity> {
     return this.userService.create(createUserDto, files);
@@ -86,7 +80,7 @@ export class UserController {
     @Param('id') id: string,
     @Query() query?: string,
   ): Promise<UserPublicEntity> {
-    return this.userService.findOne({ where: { id }, ...deserializeQueryString(query) });
+    return this.userService.findOne(_.merge(deserializeQueryString(query), { where: { id } }));
   }
 
   @ApiOkResponse({ description: 'User was successfully updated.', type: UserPublicEntity })
@@ -106,14 +100,8 @@ export class UserController {
   public async update(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
-    @UploadedFiles(
-      new ParseFilePipe({
-        validators: [
-          new MaxFileSizeValidator({ maxSize: 50 * 1024 * 1024 }),
-          new FileTypeValidator({ fileType: 'image/*' }),
-        ],
-      }),
-    )
+    @UploadedFiles()
+    @UploadRestrictions([{ fieldname: 'image', minFileSize: 1 }])
     files: UpdateUserUploadedFiles,
   ): Promise<UserPublicEntity> {
     return this.userService.update(id, updateUserDto, files);
