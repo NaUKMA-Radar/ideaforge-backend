@@ -12,11 +12,10 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { ConfigVariables, Routes, UserRegistrationMethods } from 'src/core/enums/app.enums';
+import { ConfigVariables, Routes } from 'src/core/enums/app.enums';
 import { RoutesApiTags } from 'src/core/constants';
 import { UserPublicEntity } from 'src/modules/user/entities/user-public.entity';
 import { CreateUserDto } from 'src/modules/user/DTO/create-user.dto';
-import { LoginDto } from 'src/modules/auth/DTO/login.dto';
 import { ConfigService } from '@nestjs/config';
 import { Auth } from 'src/core/decorators/auth.decorator';
 import {
@@ -24,6 +23,8 @@ import {
   RefreshResponse,
   RegisterResponse,
 } from 'src/modules/auth/types/auth.types';
+import { LoginWithCredentialsDto } from 'src/modules/auth/DTO/login-with-credentials.dto';
+import { LoginWithGoogleDto } from 'src/modules/auth/DTO/login-with-google.dto';
 
 @ApiTags(RoutesApiTags[Routes.Auth])
 @Controller(Routes.Auth)
@@ -80,12 +81,46 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: 'Cannot log in the user.' })
   @ApiConflictResponse({ description: 'Cannot log in the user. Invalid data was provided.' })
   @ApiInternalServerErrorResponse({ description: 'Internal server error was occured.' })
-  @Post('/login')
-  public async login(
-    @Body() loginDto: LoginDto,
+  @Post('/login/credentials')
+  public async loginWithCredentials(
+    @Body() loginWithCredentialsDto: LoginWithCredentialsDto,
     @Res() response: Response,
   ): Promise<Response<LoginResponse>> {
-    const user = await this.authService.login(loginDto);
+    const user = await this.authService.loginWithCredentials(loginWithCredentialsDto);
+
+    return response
+      .status(HttpStatus.CREATED)
+      .cookie(
+        this.configService.get<string>(ConfigVariables.CookieAccessTokenName) ||
+          'Ideaforge-Access-Token',
+        user.accessToken,
+        {
+          httpOnly: true,
+          domain: this.configService.get<string>(ConfigVariables.CookieDomain),
+        },
+      )
+      .cookie(
+        this.configService.get<string>(ConfigVariables.CookieRefreshTokenName) ||
+          'Ideaforge-Refresh-Token',
+        user.refreshToken,
+        {
+          httpOnly: true,
+          domain: this.configService.get<string>(ConfigVariables.CookieDomain),
+        },
+      )
+      .json(user);
+  }
+
+  @ApiCreatedResponse({ description: 'User was successfully logged in.', type: UserPublicEntity })
+  @ApiUnauthorizedResponse({ description: 'Cannot log in the user.' })
+  @ApiConflictResponse({ description: 'Cannot log in the user. Invalid data was provided.' })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error was occured.' })
+  @Post('/login/google')
+  public async loginWithGoogle(
+    @Body() loginWithGoogleDto: LoginWithGoogleDto,
+    @Res() response: Response,
+  ): Promise<Response<LoginResponse>> {
+    const user = await this.authService.loginWithGoogle(loginWithGoogleDto);
 
     return response
       .status(HttpStatus.CREATED)
