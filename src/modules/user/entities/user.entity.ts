@@ -134,4 +134,7 @@ export class UserEntity implements User {
   @IsNotEmpty()
   @IsDefined()
   updatedAt: Date;
+
+  @ApiProperty({ description: "User's registration method nested object" })
+  userRegistrationMethod?: any; // TODO: Replace with UserRegistrationMethodEntity once it is ready
 }

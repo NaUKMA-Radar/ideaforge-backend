@@ -13,7 +13,7 @@ export class LocalAuthGuard extends AuthGuard('local') {
     super();
   }
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  public async canActivate(context: ExecutionContext): Promise<boolean> {
     try {
       const canBeActivated = await super.canActivate(context);
 

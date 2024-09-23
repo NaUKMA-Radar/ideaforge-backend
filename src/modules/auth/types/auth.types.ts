@@ -1,12 +1,12 @@
-import { User } from "@prisma/client";
+import { User } from '@prisma/client';
 
-export interface LoginResponse extends User {
+export interface LoginResponse extends Omit<User, 'password'> {
   accessToken: string;
   refreshToken: string;
   [key: string]: any;
 }
 
-export interface RegisterResponse extends User {
+export interface RegisterResponse extends Omit<User, 'password'> {
   accessToken: string;
   refreshToken: string;
   [key: string]: any;

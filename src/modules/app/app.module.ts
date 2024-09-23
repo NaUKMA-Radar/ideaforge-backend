@@ -1,8 +1,10 @@
+import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigVariables } from 'src/core/enums/app.enums';
+import { AuthModule } from 'src/modules/auth/auth.module';
 import { PasswordModule } from 'src/modules/password/password.module';
 import { PasswordModuleOptions } from 'src/modules/password/types/password.types';
 import { PrismaModule } from 'src/modules/prisma/prisma.module';
@@ -30,7 +32,6 @@ import { UserModule } from 'src/modules/user/user.module';
           issuer: configService.get<string>(ConfigVariables.JwtIssuer),
           expiresIn: configService.get<string>(ConfigVariables.JwtAccessTokenDuration),
         },
-        global: true,
       }),
       inject: [ConfigService],
     }),
@@ -52,6 +53,7 @@ import { UserModule } from 'src/modules/user/user.module';
       inject: [ConfigService],
     }),
     UserModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],
