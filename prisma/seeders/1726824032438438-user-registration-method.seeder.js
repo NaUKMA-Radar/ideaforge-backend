@@ -2,7 +2,7 @@ const { prisma } = require('../utils/prisma.utils');
 
 module.exports = {
   async up() {
-    const data = [{ name: 'Credentials' }, { name: 'Google' }];
+    const data = [{ name: 'credentials' }, { name: 'google' }];
 
     await prisma.userRegistrationMethod.createMany({ data });
   },
