@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Post, Query, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Post, Query, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   ApiConflictResponse,
@@ -7,7 +7,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { RoutesApiTags } from 'src/core/constants';
 import { ConfigVariables, Routes } from 'src/core/enums/app.enums';
 import { AuthService } from 'src/modules/auth/auth.service';

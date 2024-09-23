@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsDefined, IsEmail, IsNotEmpty, IsString, MaxLength, ValidateIf } from 'class-validator';
 import { UserEntity } from 'src/modules/user/entities/user.entity';
 
-export class LoginDto implements Pick<UserEntity, 'email' | 'password'> {
+export class LoginWithCredentialsDto implements Pick<UserEntity, 'email' | 'password'> {
   @ApiProperty({
     description: 'The email of the user',
     examples: [

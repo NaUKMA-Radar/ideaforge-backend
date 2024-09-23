@@ -18,10 +18,11 @@ import {
   RegisterResponse,
 } from 'src/modules/auth/types/auth.types';
 import { UserEntity } from 'src/modules/user/entities/user.entity';
-import { LoginDto } from 'src/modules/auth/DTO/login.dto';
 import { LogoutDto } from 'src/modules/auth/DTO/logout.dto';
 import { RefreshDto } from 'src/modules/auth/DTO/refresh.dto';
 import { HttpService } from '@nestjs/axios';
+import { LoginWithCredentialsDto } from 'src/modules/auth/DTO/login-with-credentials.dto';
+import { LoginWithGoogleDto } from 'src/modules/auth/DTO/login-with-google.dto';
 
 @Injectable()
 export class AuthService {
@@ -38,7 +39,7 @@ export class AuthService {
     this.googleOAuth2Client = new google.auth.OAuth2(
       configService.get<string>(ConfigVariables.GoogleClientId),
       configService.get<string>(ConfigVariables.GoogleClientSecret),
-      `${configService.get<string>(ConfigVariables.ServerUri)}/oauth/callback/google`,
+      `${configService.get<string>(ConfigVariables.ServerUri)}/oauth2/callback/google`,
     );
   }
 
@@ -94,17 +95,20 @@ export class AuthService {
     return { ...user, accessToken, refreshToken };
   }
 
-  public async login(loginDto: LoginDto): Promise<LoginResponse> {
+  public async loginWithCredentials(
+    loginWithCredentialsDto: LoginWithCredentialsDto,
+  ): Promise<LoginResponse> {
+    const { email, password } = loginWithCredentialsDto;
     const user = await this.prismaService.user.findUniqueOrThrow({
-      where: { email: loginDto.email },
+      where: { email },
       include: { userRegistrationMethod: true },
     });
 
     if (user.userRegistrationMethod?.name !== UserRegistrationMethods.Credentials) {
       if (
         !user.password ||
-        !loginDto.password ||
-        !(await this.passwordService.compare(loginDto.password, user.password))
+        !password ||
+        !(await this.passwordService.compare(password, user.password))
       ) {
         throw new AuthException(
           'The provided credentials are invalid. Please verify your email and password and try again.',
@@ -112,7 +116,7 @@ export class AuthService {
       }
     }
 
-    await this.validateUser(loginDto.email, loginDto.password);
+    await this.validateUser(email, password);
 
     const { accessToken, refreshToken } = await this.generateJwtTokensPair(user);
 
@@ -121,8 +125,9 @@ export class AuthService {
     return { ...user, accessToken, refreshToken };
   }
 
-  public async loginWithGoogle(googleAccessToken: string): Promise<LoginResponse> {
+  public async loginWithGoogle(loginWithGoogleDto: LoginWithGoogleDto): Promise<LoginResponse> {
     try {
+      const { googleAccessToken } = loginWithGoogleDto;
       const { email } = await this.googleOAuth2Client.getTokenInfo(googleAccessToken);
 
       const user = await this.userService.findOne({ where: { email } });
