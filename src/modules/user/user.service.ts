@@ -82,7 +82,20 @@ export class UserService {
         omit: { password: true, refreshToken: true },
       })
       .then(async user => {
-        if (files?.image?.length && imageInDto !== 'null') {
+        if (imageInDto === 'null') {
+          await this.prismaService.user.update({
+            where: { id: user.id },
+            data: { image: null },
+          });
+
+          if (user.image) {
+            this.supabaseService.remove([user.image]);
+          }
+
+          return user;
+        }
+
+        if (files?.image?.length) {
           const image = files.image[0];
           const filename = `${Routes.Users}/${uuid()}${path.extname(image.originalname)}`;
 
@@ -94,19 +107,10 @@ export class UserService {
               });
 
               if (user.image) {
-                await this.supabaseService.remove([user.image]);
+                this.supabaseService.remove([user.image]);
               }
             }
           });
-        } else if (imageInDto === 'null') {
-          await this.prismaService.user.update({
-            where: { id: user.id },
-            data: { image: null },
-          });
-
-          if (user.image) {
-            await this.supabaseService.remove([user.image]);
-          }
         }
 
         return user;
