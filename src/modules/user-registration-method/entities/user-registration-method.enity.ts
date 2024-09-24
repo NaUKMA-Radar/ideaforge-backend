@@ -45,7 +45,7 @@ export class UserRegistrationMethodEntity implements UserRegistrationMethod {
   createdAt: Date;
 
   @ApiProperty({
-    description: 'Project last updated date and time',
+    description: 'User registration method last updated date and time',
     examples: [new Date('2024-01-03'), new Date('2023-11-02'), new Date('2023-06-30')],
     default: new Date('2024-01-03'),
   })
