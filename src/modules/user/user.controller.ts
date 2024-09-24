@@ -67,6 +67,8 @@ export class UserController {
 
   @Auth(JwtAuthGuard)
   @ApiOkResponse({ description: 'The list of users', type: [UserPublicEntity] })
+  @ApiUnauthorizedResponse({ description: 'The user is unauthorized.' })
+  @ApiForbiddenResponse({ description: 'The user is forbidden to perform this action.' })
   @ApiInternalServerErrorResponse({ description: 'Internal server error was occured.' })
   @Get()
   public async findAll(@Query() query?: string): Promise<UserPublicEntity[]> {
@@ -75,6 +77,8 @@ export class UserController {
 
   @Auth(JwtAuthGuard)
   @ApiOkResponse({ description: 'The user with requested id.', type: UserPublicEntity })
+  @ApiUnauthorizedResponse({ description: 'The user is unauthorized.' })
+  @ApiForbiddenResponse({ description: 'The user is forbidden to perform this action.' })
   @ApiNotFoundResponse({ description: 'The user with the requested id was not found.' })
   @ApiInternalServerErrorResponse({ description: 'Internal server error was occured.' })
   @ApiParam({
@@ -84,7 +88,7 @@ export class UserController {
   })
   @Get(':id')
   public async findById(
-    @Param('id') id: string,
+    @Param('id') id: UserPublicEntity['id'],
     @Query() query?: string,
   ): Promise<UserPublicEntity> {
     return this.userService.findOne(_.merge(deserializeQueryString(query), { where: { id } }));
@@ -106,7 +110,7 @@ export class UserController {
   @UseInterceptors(FileFieldsInterceptor([{ name: 'image', maxCount: 1 }]))
   @Put(':id')
   public async update(
-    @Param('id') id: string,
+    @Param('id') id: UserPublicEntity['id'],
     @Body() updateUserDto: UpdateUserDto,
     @AuthenticatedUser() user: UserPublicEntity,
     @UploadedFiles()
@@ -118,7 +122,7 @@ export class UserController {
         message: 'Cannot update the user with the id different from yours',
         error: 'Forbidden action',
         statusCode: HttpStatus.FORBIDDEN,
-      }); 
+      });
     }
 
     return this.userService.update(id, updateUserDto, files);
@@ -137,7 +141,7 @@ export class UserController {
   })
   @Delete(':id')
   public async remove(
-    @Param('id') id: string,
+    @Param('id') id: UserPublicEntity['id'],
     @AuthenticatedUser() user: UserPublicEntity,
   ): Promise<UserPublicEntity> {
     if (id !== user.id) {

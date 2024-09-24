@@ -27,7 +27,7 @@ export class OAuth2Controller {
   })
   @ApiInternalServerErrorResponse({ description: 'Internal server error was occured.' })
   @Post('/google')
-  public async generateGoogleOAuth2Url(@Body() data, @Res() response: Response) {
+  public async generateGoogleOAuth2Url(@Body() data, @Res() response: Response): Promise<Response> {
     const url = await this.authService.generateGoogleOAuth2Url(data);
 
     return response.status(HttpStatus.CREATED).json({ url });
