@@ -118,7 +118,7 @@ export class UserController {
         message: 'Cannot update the user with the id different from yours',
         error: 'Forbidden action',
         statusCode: HttpStatus.FORBIDDEN,
-      });
+      }); 
     }
 
     return this.userService.update(id, updateUserDto, files);
