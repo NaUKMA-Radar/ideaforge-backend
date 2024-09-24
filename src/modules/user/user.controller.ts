@@ -2,7 +2,9 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -36,13 +38,16 @@ import {
 } from 'src/modules/user/types/user.types';
 import * as _ from 'lodash';
 import { UploadRestrictions } from 'src/core/decorators/upload-restrictions.decorator';
-import { Request } from 'express';
+import { Auth } from 'src/core/decorators/auth.decorator';
+import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
+import { AuthenticatedUser } from 'src/core/decorators/authenticated-user.decorator';
 
 @ApiTags(RoutesApiTags[Routes.Users])
 @Controller(Routes.Users)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Auth(JwtAuthGuard)
   @ApiCreatedResponse({ description: 'User was successfully created.', type: UserPublicEntity })
   @ApiUnauthorizedResponse({ description: 'The user is unauthorized.' })
   @ApiForbiddenResponse({ description: 'The user is forbidden to perform this action.' })
@@ -60,6 +65,7 @@ export class UserController {
     return this.userService.create(createUserDto, files);
   }
 
+  @Auth(JwtAuthGuard)
   @ApiOkResponse({ description: 'The list of users', type: [UserPublicEntity] })
   @ApiInternalServerErrorResponse({ description: 'Internal server error was occured.' })
   @Get()
@@ -67,6 +73,7 @@ export class UserController {
     return this.userService.findAll(deserializeQueryString(query));
   }
 
+  @Auth(JwtAuthGuard)
   @ApiOkResponse({ description: 'The user with requested id.', type: UserPublicEntity })
   @ApiNotFoundResponse({ description: 'The user with the requested id was not found.' })
   @ApiInternalServerErrorResponse({ description: 'Internal server error was occured.' })
@@ -83,6 +90,7 @@ export class UserController {
     return this.userService.findOne(_.merge(deserializeQueryString(query), { where: { id } }));
   }
 
+  @Auth(JwtAuthGuard)
   @ApiOkResponse({ description: 'User was successfully updated.', type: UserPublicEntity })
   @ApiUnauthorizedResponse({ description: 'The user is unauthorized.' })
   @ApiForbiddenResponse({ description: 'The user is forbidden to perform this action.' })
@@ -100,13 +108,23 @@ export class UserController {
   public async update(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
+    @AuthenticatedUser() user: UserPublicEntity,
     @UploadedFiles()
     @UploadRestrictions([{ fieldname: 'image', minFileSize: 1 }])
     files: UpdateUserUploadedFiles,
   ): Promise<UserPublicEntity> {
+    if (id !== user.id) {
+      throw new ForbiddenException({
+        message: 'Cannot update the user with the id different from yours',
+        error: 'Forbidden action',
+        statusCode: HttpStatus.FORBIDDEN,
+      });
+    }
+
     return this.userService.update(id, updateUserDto, files);
   }
 
+  @Auth(JwtAuthGuard)
   @ApiOkResponse({ description: 'User was successfully removed.', type: UserPublicEntity })
   @ApiUnauthorizedResponse({ description: 'The user is unauthorized.' })
   @ApiForbiddenResponse({ description: 'The user is forbidden to perform this action.' })
@@ -118,7 +136,18 @@ export class UserController {
     schema: { example: '23fbed56-1bb9-40a0-8977-2dd0f0c6c31f' },
   })
   @Delete(':id')
-  public async remove(@Param('id') id: string): Promise<UserPublicEntity> {
+  public async remove(
+    @Param('id') id: string,
+    @AuthenticatedUser() user: UserPublicEntity,
+  ): Promise<UserPublicEntity> {
+    if (id !== user.id) {
+      throw new ForbiddenException({
+        message: 'Cannot remove the user with the id different from yours',
+        error: 'Forbidden action',
+        statusCode: HttpStatus.FORBIDDEN,
+      });
+    }
+
     return this.userService.remove(id);
   }
 }
