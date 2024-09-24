@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { JsonValue } from '@prisma/client/runtime/library';
+import { Transform } from 'class-transformer';
 import { IsString, MaxLength, ValidateIf } from 'class-validator';
 import { ProjectEntity } from 'src/modules/project/entities/project.entity';
 import { CreateUserToProjectDto } from 'src/modules/user-to-project/DTO/create-user-to-project.dto';
@@ -52,10 +53,17 @@ export class UpdateProjectDto
   image?: string | null;
 
   @ApiProperty({ description: 'The list of users to add to the project' })
+  @Transform(field => field.value.map(item => ({ ...item, userRoleId: Number(item.userRoleId) })))
   @ValidateIf((_, value) => value)
   usersToAdd?: Omit<CreateUserToProjectDto, 'projectId'>[];
 
   @ApiProperty({ description: 'The list of users to update in the project' })
+  @Transform(field =>
+    field.value.map(item => ({
+      ...item,
+      userRoleId: item.userRoleId ? Number(item.userRoleId) : item.userRoleId,
+    })),
+  )
   @ValidateIf((_, value) => value)
   usersToUpdate?: Omit<UpdateUserToProjectDto, 'projectId'>[];
 

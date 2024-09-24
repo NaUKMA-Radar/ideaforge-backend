@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsDefined, IsNotEmpty, IsNumber, IsUUID, Min } from 'class-validator';
 import { UserToProjectEntity } from 'src/modules/user-to-project/entities/user-to-project.entity';
 
@@ -34,5 +35,6 @@ export class CreateUserToProjectDto
   @IsNumber()
   @IsNotEmpty()
   @IsDefined()
+  @Transform(field => Number(field.value))
   userRoleId: number;
 }
