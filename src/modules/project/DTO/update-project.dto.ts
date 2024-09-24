@@ -2,6 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import { JsonValue } from '@prisma/client/runtime/library';
 import { IsString, MaxLength, ValidateIf } from 'class-validator';
 import { ProjectEntity } from 'src/modules/project/entities/project.entity';
+import { CreateUserToProjectDto } from 'src/modules/user-to-project/DTO/create-user-to-project.dto';
+import { UpdateUserToProjectDto } from 'src/modules/user-to-project/DTO/update-user-to-project.dto';
+import { UserToProjectEntity } from 'src/modules/user-to-project/entities/user-to-project.entity';
 
 export class UpdateProjectDto
   implements
@@ -47,4 +50,16 @@ export class UpdateProjectDto
   @IsString()
   @ValidateIf((_, value) => value)
   image?: string | null;
+
+  @ApiProperty({ description: 'The list of users to add to the project' })
+  @ValidateIf((_, value) => value)
+  usersToAdd?: Omit<CreateUserToProjectDto, 'projectId'>[];
+
+  @ApiProperty({ description: 'The list of users to update in the project' })
+  @ValidateIf((_, value) => value)
+  usersToUpdate?: Omit<UpdateUserToProjectDto, 'projectId'>[];
+
+  @ApiProperty({ description: 'The list of users to remove from the project' })
+  @ValidateIf((_, value) => value)
+  usersToRemove?: Pick<UserToProjectEntity, 'userId'>[];
 }

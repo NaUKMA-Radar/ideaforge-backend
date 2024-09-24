@@ -15,6 +15,7 @@ import {
   ValidateIf,
 } from 'class-validator';
 import { UserRegistrationMethodEntity } from 'src/modules/user-registration-method/entities/user-registration-method.enity';
+import { UserToProjectEntity } from 'src/modules/user-to-project/entities/user-to-project.entity';
 
 export class UserEntity implements User {
   @ApiProperty({
@@ -138,4 +139,7 @@ export class UserEntity implements User {
 
   @ApiProperty({ description: "User's registration method nested object" })
   userRegistrationMethod?: UserRegistrationMethodEntity | null;
+
+  @ApiProperty({ description: 'The list of projects the user is member of' })
+  usersToProjects?: UserToProjectEntity[];
 }

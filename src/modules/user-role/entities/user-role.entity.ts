@@ -9,6 +9,7 @@ import {
   MaxDate,
   MaxLength,
 } from 'class-validator';
+import { UserToProjectEntity } from 'src/modules/user-to-project/entities/user-to-project.entity';
 
 export class UserRoleEntity implements UserRole {
   @ApiProperty({
@@ -55,7 +56,7 @@ export class UserRoleEntity implements UserRole {
   updatedAt: Date;
 
   @ApiProperty({ description: 'The list of users in projects for the user role' })
-  usersToProjects?: any[]; // TODO: Replace with UserToProjectEntity[] once it is implemented
+  usersToProjects?: UserToProjectEntity[];
 
   @ApiProperty({ description: 'The list of users in stages for the user role' })
   usersToStages?: any[]; // TODO: Replace with UserToStageEntity[] once it is implemented

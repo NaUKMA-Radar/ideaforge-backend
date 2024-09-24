@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { JsonValue } from '@prisma/client/runtime/library';
 import { IsDefined, IsNotEmpty, IsString, MaxLength, ValidateIf } from 'class-validator';
 import { ProjectEntity } from 'src/modules/project/entities/project.entity';
+import { CreateUserToProjectDto } from 'src/modules/user-to-project/DTO/create-user-to-project.dto';
 
 export class CreateProjectDto
   implements
@@ -52,4 +53,8 @@ export class CreateProjectDto
   @IsString()
   @ValidateIf((_, value) => value)
   image?: string | null;
+
+  @ApiProperty({ description: 'The list of users to add to the project' })
+  @ValidateIf((_, value) => value)
+  usersToAdd?: Omit<CreateUserToProjectDto, 'projectId'>[];
 }
