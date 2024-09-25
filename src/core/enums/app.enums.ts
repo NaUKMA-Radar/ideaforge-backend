@@ -38,6 +38,11 @@ export enum Routes {
   UserRegistrationMethods = 'user-registration-methods',
   UserRoles = 'user-roles',
   Projects = 'projects',
+  Stages = 'stages',
+  StageTypes = 'stage-types',
+  Documets = 'documents',
+  DocumentTypes = 'document-types',
+  Paragraphs = 'paragraphs',
   Auth = 'auth',
   OAuth2 = 'oauth2',
 }

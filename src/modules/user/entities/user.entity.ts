@@ -16,6 +16,7 @@ import {
 } from 'class-validator';
 import { UserRegistrationMethodEntity } from 'src/modules/user-registration-method/entities/user-registration-method.enity';
 import { UserToProjectEntity } from 'src/modules/user-to-project/entities/user-to-project.entity';
+import { UserToStageEntity } from 'src/modules/user-to-stage/entities/user-to-stage.entity';
 
 export class UserEntity implements User {
   @ApiProperty({
@@ -142,4 +143,7 @@ export class UserEntity implements User {
 
   @ApiProperty({ description: 'The list of projects the user is member of' })
   usersToProjects?: UserToProjectEntity[];
+
+  @ApiProperty({ description: 'The list of stages the user is member of' })
+  usersToStages?: UserToStageEntity[];
 }

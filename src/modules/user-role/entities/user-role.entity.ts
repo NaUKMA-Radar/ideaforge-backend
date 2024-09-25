@@ -10,6 +10,7 @@ import {
   MaxLength,
 } from 'class-validator';
 import { UserToProjectEntity } from 'src/modules/user-to-project/entities/user-to-project.entity';
+import { UserToStageEntity } from 'src/modules/user-to-stage/entities/user-to-stage.entity';
 
 export class UserRoleEntity implements UserRole {
   @ApiProperty({
@@ -59,7 +60,7 @@ export class UserRoleEntity implements UserRole {
   usersToProjects?: UserToProjectEntity[];
 
   @ApiProperty({ description: 'The list of users in stages for the user role' })
-  usersToStages?: any[]; // TODO: Replace with UserToStageEntity[] once it is implemented
+  usersToStages?: UserToStageEntity[];
 
   @ApiProperty({ description: 'The list of users in documents for the user role' })
   usersToDocuments?: any[]; // TODO: Replace with UserToDocumentEntity[] once it is implemented

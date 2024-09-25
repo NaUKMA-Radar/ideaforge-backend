@@ -38,11 +38,17 @@ import {
   UpdateProjectUploadedFiles,
 } from 'src/modules/project/types/project.types';
 import { UpdateProjectDto } from 'src/modules/project/DTO/update-project.dto';
+import { StageService } from 'src/modules/stage/stage.service';
+import { CreateStageDto } from 'src/modules/stage/DTO/create-stage.dto';
+import { StageEntity } from 'src/modules/stage/entities/stage.entity';
 
 @ApiTags(RoutesApiTags[Routes.Projects])
 @Controller(Routes.Projects)
 export class ProjectController {
-  constructor(private readonly projectService: ProjectService) {}
+  constructor(
+    private readonly projectService: ProjectService,
+    private readonly stageService: StageService,
+  ) {}
 
   @Auth(JwtAuthGuard)
   @ApiCreatedResponse({ description: 'Project was successfully created.', type: ProjectEntity })
@@ -130,5 +136,55 @@ export class ProjectController {
   @Delete(':id')
   public async remove(@Param('id') id: ProjectEntity['id']): Promise<ProjectEntity> {
     return this.projectService.remove(id);
+  }
+
+  @Auth(JwtAuthGuard)
+  @ApiCreatedResponse({
+    description: 'The stage for the project with specified id was successfully created.',
+    type: StageEntity,
+  })
+  @ApiUnauthorizedResponse({ description: 'The user is unauthorized.' })
+  @ApiForbiddenResponse({ description: 'The user is forbidden to perform this action.' })
+  @ApiNotFoundResponse({ description: 'The project with the requested id was not found.' })
+  @ApiConflictResponse({
+    description:
+      'Cannot create the stage for the project with specified id. Invalid data was provided.',
+  })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error was occured.' })
+  @ApiParam({
+    name: 'id',
+    description: 'The id of the project to add new stage to',
+    schema: { example: '23fbed56-1bb9-40a0-8977-2dd0f0c6c31f' },
+  })
+  @Post(':id/stages')
+  public async createStage(
+    @Param('id') id: ProjectEntity['id'],
+    @Body() createStageDto: CreateStageDto,
+  ): Promise<StageEntity> {
+    return this.stageService.create({ ...createStageDto, projectId: id });
+  }
+
+  @Auth(JwtAuthGuard)
+  @ApiOkResponse({
+    description: 'The list of stages for the project with specified id',
+    type: [StageEntity],
+  })
+  @ApiUnauthorizedResponse({ description: 'The user is unauthorized.' })
+  @ApiForbiddenResponse({ description: 'The user is forbidden to perform this action.' })
+  @ApiNotFoundResponse({ description: 'The project with the requested id was not found.' })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error was occured.' })
+  @ApiParam({
+    name: 'id',
+    description: 'The id of the project to get the list of stages',
+    schema: { example: '23fbed56-1bb9-40a0-8977-2dd0f0c6c31f' },
+  })
+  @Get(':id/stages')
+  public async findAllStagesByProjectId(
+    @Param('id') id: ProjectEntity['id'],
+    @Query() query?: string,
+  ): Promise<StageEntity[]> {
+    return this.stageService.findAll(
+      _.merge(deserializeQueryString(query), { where: { projectId: id } }),
+    );
   }
 }
