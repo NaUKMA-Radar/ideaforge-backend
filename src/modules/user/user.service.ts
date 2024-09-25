@@ -65,7 +65,7 @@ export class UserService {
   }
 
   public async update(
-    id: string,
+    id: UserPublicEntity['id'],
     data: UpdateUserDto,
     files?: UpdateUserUploadedFiles,
   ): Promise<UserPublicEntity> {
@@ -117,7 +117,7 @@ export class UserService {
       });
   }
 
-  public async remove(id: string): Promise<UserPublicEntity> {
+  public async remove(id: UserPublicEntity['id']): Promise<UserPublicEntity> {
     return this.prismaService.user
       .delete({
         where: { id },

@@ -35,6 +35,9 @@ export enum UserRegistrationMethods {
 
 export enum Routes {
   Users = 'users',
+  UserRegistrationMethods = 'user-registration-methods',
+  UserRoles = 'user-roles',
+  Projects = 'projects',
   Auth = 'auth',
   OAuth2 = 'oauth2',
 }

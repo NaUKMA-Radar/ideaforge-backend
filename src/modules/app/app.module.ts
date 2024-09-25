@@ -1,4 +1,3 @@
-import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule, JwtService } from '@nestjs/jwt';
@@ -8,6 +7,7 @@ import { AuthModule } from 'src/modules/auth/auth.module';
 import { PasswordModule } from 'src/modules/password/password.module';
 import { PasswordModuleOptions } from 'src/modules/password/types/password.types';
 import { PrismaModule } from 'src/modules/prisma/prisma.module';
+import { ProjectModule } from 'src/modules/project/project.module';
 import { SupabaseModule } from 'src/modules/supabase/supabase.module';
 import { SupabaseModuleOptions } from 'src/modules/supabase/types/supabase.types';
 import { UserModule } from 'src/modules/user/user.module';
@@ -54,6 +54,7 @@ import { UserModule } from 'src/modules/user/user.module';
     }),
     UserModule,
     AuthModule,
+    ProjectModule,
   ],
   controllers: [],
   providers: [],

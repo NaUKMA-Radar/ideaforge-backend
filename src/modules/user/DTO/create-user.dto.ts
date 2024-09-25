@@ -86,4 +86,9 @@ export class CreateUserDto
   @IsDefined()
   @ValidateIf((_, value) => value)
   password?: string | null;
+
+  @ApiProperty({ description: 'The path to the image of the user' })
+  @IsString()
+  @ValidateIf((_, value) => value)
+  image?: string | null;
 }
