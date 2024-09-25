@@ -1,33 +1,33 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Stage } from '@prisma/client';
+import { UserToStage } from '@prisma/client';
 import { IsDate, IsDefined, IsNotEmpty, IsNumber, IsUUID, MaxDate, Min } from 'class-validator';
-import { ProjectEntity } from 'src/modules/project/entities/project.entity';
-import { StageTypeEntity } from 'src/modules/stage-type/entities/stage-type.entity';
-import { UserToStageEntity } from 'src/modules/user-to-stage/entities/user-to-stage.entity';
+import { StageEntity } from 'src/modules/stage/entities/stage.entity';
+import { UserRoleEntity } from 'src/modules/user-role/entities/user-role.entity';
+import { UserPublicEntity } from 'src/modules/user/entities/user-public.entity';
 
-export class StageEntity implements Stage {
+export class UserToStageEntity implements UserToStage {
   @ApiProperty({
-    description: 'The UUID of the stage',
+    description: 'The UUID of the user',
     examples: ['b7af9cd4-5533-4737-862b-78bce985c987', '989d32c2-abd4-43d3-a420-ee175ae16b98'],
     default: '989d32c2-abd4-43d3-a420-ee175ae16b98',
   })
   @IsUUID()
   @IsNotEmpty()
   @IsDefined()
-  id: string;
+  userId: string;
 
   @ApiProperty({
-    description: 'The UUID of the project of the stage',
+    description: 'The UUID of the stage',
     examples: ['b7af9cd4-5533-4737-862b-78bce985c987', '989d32c2-abd4-43d3-a420-ee175ae16b98'],
     default: 'b7af9cd4-5533-4737-862b-78bce985c987',
   })
   @IsUUID()
   @IsNotEmpty()
   @IsDefined()
-  projectId: string;
+  stageId: string;
 
   @ApiProperty({
-    description: 'Stage type id',
+    description: 'User role id',
     examples: [1, 2, 3, 4, 5],
     default: 1,
   })
@@ -35,10 +35,10 @@ export class StageEntity implements Stage {
   @IsNumber()
   @IsNotEmpty()
   @IsDefined()
-  stageTypeId: number;
+  userRoleId: number;
 
   @ApiProperty({
-    description: 'Stage creation date and time',
+    description: 'User to project creation date and time',
     examples: [new Date('2024-01-03'), new Date('2023-11-02'), new Date('2023-06-30')],
     default: new Date('2024-01-03'),
   })
@@ -49,7 +49,7 @@ export class StageEntity implements Stage {
   createdAt: Date;
 
   @ApiProperty({
-    description: 'Stage last updated date and time',
+    description: 'User to project last updated date and time',
     examples: [new Date('2024-01-03'), new Date('2023-11-02'), new Date('2023-06-30')],
     default: new Date('2024-01-03'),
   })
@@ -59,12 +59,12 @@ export class StageEntity implements Stage {
   @IsDefined()
   updatedAt: Date;
 
-  @ApiProperty({ description: 'Stage project nested object' })
-  project?: ProjectEntity | null;
+  @ApiProperty({ description: 'User nested object' })
+  user?: UserPublicEntity | null;
 
-  @ApiProperty({ description: 'Stage type nested object' })
-  stageType?: StageTypeEntity | null;
+  @ApiProperty({ description: 'Stage nested object' })
+  stage?: StageEntity | null;
 
-  @ApiProperty({ description: 'The list of users in stages for the user role' })
-  usersToStages?: UserToStageEntity[];
+  @ApiProperty({ description: 'User role nested object' })
+  userRole?: UserRoleEntity | null;
 }

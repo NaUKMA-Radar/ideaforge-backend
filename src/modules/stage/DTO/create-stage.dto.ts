@@ -1,6 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDefined, IsNotEmpty, IsNumber, IsUUID, Min } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsDefined, IsNotEmpty, IsNumber, IsUUID, Min, ValidateIf } from 'class-validator';
 import { StageEntity } from 'src/modules/stage/entities/stage.entity';
+import { CreateUserToStageDto } from 'src/modules/user-to-stage/DTO/create-user-to-stage.dto';
 
 export class CreateStageDto implements Pick<StageEntity, 'projectId' | 'stageTypeId'> {
   @ApiProperty({
@@ -23,4 +25,9 @@ export class CreateStageDto implements Pick<StageEntity, 'projectId' | 'stageTyp
   @IsNotEmpty()
   @IsDefined()
   stageTypeId: number;
+
+  @ApiProperty({ description: 'The list of users to add to the stage' })
+  @Transform(field => field.value.map(item => ({ ...item, userRoleId: Number(item.userRoleId) })))
+  @ValidateIf((_, value) => value)
+  usersToAdd?: Omit<CreateUserToStageDto, 'stageId'>[];
 }
