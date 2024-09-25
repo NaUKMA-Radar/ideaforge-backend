@@ -11,6 +11,7 @@ import {
   MaxDate,
   Min,
 } from 'class-validator';
+import { DocumentTypeEntity } from 'src/modules/document-type/entities/document-type.entity';
 import { StageEntity } from 'src/modules/stage/entities/stage.entity';
 
 export class DocumentEntity implements Document {
@@ -90,7 +91,7 @@ export class DocumentEntity implements Document {
   stage?: StageEntity | null;
 
   @ApiProperty({ description: 'Document type nested object' })
-  documentType?: any | null;
+  documentType?: DocumentTypeEntity | null;
 
   @ApiProperty({ description: 'The list of users in document' })
   usersToDocuments?: any[];
