@@ -7,7 +7,7 @@ export const RoutesApiTags = {
   [Routes.Projects]: 'Projects',
   [Routes.Stages]: 'Stages',
   [Routes.StageTypes]: 'Stage types',
-  [Routes.Documets]: 'Documents',
+  [Routes.Documents]: 'Documents',
   [Routes.DocumentTypes]: 'Document types',
   [Routes.Paragraphs]: 'Paragraphs',
   [Routes.Auth]: 'Auth',
