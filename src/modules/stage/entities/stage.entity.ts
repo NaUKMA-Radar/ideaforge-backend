@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Stage } from '@prisma/client';
 import { IsDate, IsDefined, IsNotEmpty, IsNumber, IsUUID, MaxDate, Min } from 'class-validator';
 import { ProjectEntity } from 'src/modules/project/entities/project.entity';
+import { StageTypeEntity } from 'src/modules/stage-type/entities/stage-type.entity';
 
 export class StageEntity implements Stage {
   @ApiProperty({
@@ -61,5 +62,5 @@ export class StageEntity implements Stage {
   project?: ProjectEntity | null;
 
   @ApiProperty({ description: 'Stage type nested object' })
-  stageType?: any | null;
+  stageType?: StageTypeEntity | null;
 }
