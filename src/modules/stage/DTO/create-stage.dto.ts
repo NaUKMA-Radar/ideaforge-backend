@@ -4,16 +4,17 @@ import { IsDefined, IsNotEmpty, IsNumber, IsUUID, Min, ValidateIf } from 'class-
 import { StageEntity } from 'src/modules/stage/entities/stage.entity';
 import { CreateUserToStageDto } from 'src/modules/user-to-stage/DTO/create-user-to-stage.dto';
 
-export class CreateStageDto implements Pick<StageEntity, 'projectId' | 'stageTypeId'> {
+export class CreateStageDto
+  implements Pick<Partial<StageEntity>, 'projectId'>, Pick<StageEntity, 'stageTypeId'>
+{
   @ApiProperty({
     description: 'The UUID of the project of the stage',
     examples: ['b7af9cd4-5533-4737-862b-78bce985c987', '989d32c2-abd4-43d3-a420-ee175ae16b98'],
     default: 'b7af9cd4-5533-4737-862b-78bce985c987',
   })
   @IsUUID()
-  @IsNotEmpty()
-  @IsDefined()
-  projectId: string;
+  @ValidateIf((_, value) => value)
+  projectId?: string;
 
   @ApiProperty({
     description: 'Stage type id',
