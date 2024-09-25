@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Stage } from '@prisma/client';
 import { IsDate, IsDefined, IsNotEmpty, IsNumber, IsUUID, MaxDate, Min } from 'class-validator';
+import { DocumentEntity } from 'src/modules/document/entities/document.entity';
 import { ProjectEntity } from 'src/modules/project/entities/project.entity';
 import { StageTypeEntity } from 'src/modules/stage-type/entities/stage-type.entity';
 import { UserToStageEntity } from 'src/modules/user-to-stage/entities/user-to-stage.entity';
@@ -65,6 +66,9 @@ export class StageEntity implements Stage {
   @ApiProperty({ description: 'Stage type nested object' })
   stageType?: StageTypeEntity | null;
 
-  @ApiProperty({ description: 'The list of users in stages for the user role' })
+  @ApiProperty({ description: 'The list of users in stage' })
   usersToStages?: UserToStageEntity[];
+
+  @ApiProperty({ description: 'The list of documents of the stage' })
+  documents?: DocumentEntity[];
 }

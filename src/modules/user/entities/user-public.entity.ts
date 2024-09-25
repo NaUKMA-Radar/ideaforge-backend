@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { UserRegistrationMethod } from '@prisma/client';
 import {
   IsDate,
   IsDefined,
@@ -13,6 +14,8 @@ import {
   Min,
   ValidateIf,
 } from 'class-validator';
+import { UserToProjectEntity } from 'src/modules/user-to-project/entities/user-to-project.entity';
+import { UserToStageEntity } from 'src/modules/user-to-stage/entities/user-to-stage.entity';
 import { UserEntity } from 'src/modules/user/entities/user.entity';
 
 export class UserPublicEntity implements Omit<UserEntity, 'password' | 'refreshToken'> {
@@ -108,5 +111,11 @@ export class UserPublicEntity implements Omit<UserEntity, 'password' | 'refreshT
   updatedAt: Date;
 
   @ApiProperty({ description: "User's registration method nested object" })
-  userRegistrationMethod?: any; // TODO: Replace with UserRegistrationMethodEntity once it is ready
+  userRegistrationMethod?: UserRegistrationMethod | null;
+
+  @ApiProperty({ description: 'The list of projects the user is member of' })
+  usersToProjects?: UserToProjectEntity[];
+
+  @ApiProperty({ description: 'The list of stages the user is member of' })
+  usersToStages?: UserToStageEntity[];
 }

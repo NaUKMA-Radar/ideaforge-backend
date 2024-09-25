@@ -11,6 +11,7 @@ import {
   MaxLength,
   ValidateIf,
 } from 'class-validator';
+import { StageEntity } from 'src/modules/stage/entities/stage.entity';
 import { UserToProjectEntity } from 'src/modules/user-to-project/entities/user-to-project.entity';
 
 export class ProjectEntity implements Project {
@@ -95,5 +96,5 @@ export class ProjectEntity implements Project {
   usersToProjects?: UserToProjectEntity[];
 
   @ApiProperty({ description: 'The list of stages for the project' })
-  stages?: any[]; // TODO: Replace with UserToProjectEntity once it is ready
+  stages?: StageEntity[];
 }
