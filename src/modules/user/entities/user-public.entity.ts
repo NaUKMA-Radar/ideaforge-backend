@@ -14,6 +14,7 @@ import {
   Min,
   ValidateIf,
 } from 'class-validator';
+import { UserToDocumentEntity } from 'src/modules/user-to-document/entities/user-to-document.entity';
 import { UserToProjectEntity } from 'src/modules/user-to-project/entities/user-to-project.entity';
 import { UserToStageEntity } from 'src/modules/user-to-stage/entities/user-to-stage.entity';
 import { UserEntity } from 'src/modules/user/entities/user.entity';
@@ -118,4 +119,7 @@ export class UserPublicEntity implements Omit<UserEntity, 'password' | 'refreshT
 
   @ApiProperty({ description: 'The list of stages the user is member of' })
   usersToStages?: UserToStageEntity[];
+
+  @ApiProperty({ description: 'The list of documents the user is member of' })
+  usersToDocuments?: UserToDocumentEntity[];
 }

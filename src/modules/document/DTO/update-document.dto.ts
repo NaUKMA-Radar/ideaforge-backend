@@ -1,7 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { JsonValue } from '@prisma/client/runtime/library';
+import { Transform } from 'class-transformer';
 import { IsBoolean, IsNumber, IsUUID, Min, ValidateIf } from 'class-validator';
 import { DocumentEntity } from 'src/modules/document/entities/document.entity';
+import { CreateUserToDocumentDto } from 'src/modules/user-to-document/DTO/create-user-to-document.dto';
+import { UpdateUserToDocumentDto } from 'src/modules/user-to-document/DTO/update-user-to-document.dto';
+import { UserToDocumentEntity } from 'src/modules/user-to-document/entities/user-to-document.entity';
 
 export class UpdateDocumentDto
   implements
@@ -41,4 +45,23 @@ export class UpdateDocumentDto
   })
   @ValidateIf((_, value) => value)
   initialData?: JsonValue;
+
+  @ApiProperty({ description: 'The list of users to add to the document' })
+  @Transform(field => field.value.map(item => ({ ...item, userRoleId: Number(item.userRoleId) })))
+  @ValidateIf((_, value) => value)
+  usersToAdd?: Omit<CreateUserToDocumentDto, 'documentId'>[];
+
+  @ApiProperty({ description: 'The list of users to update in the document' })
+  @Transform(field =>
+    field.value.map(item => ({
+      ...item,
+      userRoleId: item.userRoleId ? Number(item.userRoleId) : item.userRoleId,
+    })),
+  )
+  @ValidateIf((_, value) => value)
+  usersToUpdate?: Omit<UpdateUserToDocumentDto, 'documentId'>[];
+
+  @ApiProperty({ description: 'The list of users to remove from the document' })
+  @ValidateIf((_, value) => value)
+  usersToRemove?: Pick<UserToDocumentEntity, 'userId'>[];
 }

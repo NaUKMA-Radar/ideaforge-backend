@@ -13,6 +13,7 @@ import {
 } from 'class-validator';
 import { DocumentTypeEntity } from 'src/modules/document-type/entities/document-type.entity';
 import { StageEntity } from 'src/modules/stage/entities/stage.entity';
+import { UserToDocumentEntity } from 'src/modules/user-to-document/entities/user-to-document.entity';
 
 export class DocumentEntity implements Document {
   @ApiProperty({
@@ -94,5 +95,5 @@ export class DocumentEntity implements Document {
   documentType?: DocumentTypeEntity | null;
 
   @ApiProperty({ description: 'The list of users in document' })
-  usersToDocuments?: any[];
+  usersToDocuments?: UserToDocumentEntity[];
 }
