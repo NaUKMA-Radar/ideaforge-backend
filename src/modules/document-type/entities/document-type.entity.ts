@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { StageType } from '@prisma/client';
+import { DocumentType } from '@prisma/client';
 import {
   IsDate,
   IsDefined,
@@ -9,11 +9,11 @@ import {
   MaxDate,
   MaxLength,
 } from 'class-validator';
-import { StageEntity } from 'src/modules/stage/entities/stage.entity';
+import { DocumentEntity } from 'src/modules/document/entities/document.entity';
 
-export class StageTypeEntity implements StageType {
+export class DocumentTypeEntity implements DocumentType {
   @ApiProperty({
-    description: 'The id of the stage type',
+    description: 'The id of the document type',
     examples: [1, 2, 3, 4, 5],
     default: 1,
   })
@@ -23,9 +23,9 @@ export class StageTypeEntity implements StageType {
   id: number;
 
   @ApiProperty({
-    description: 'The name of the stage type',
-    examples: ['pitchdeck'],
-    default: 'pitchdeck',
+    description: 'The name of the document type',
+    examples: ['presentation'],
+    default: 'presentation',
   })
   @MaxLength(50)
   @IsString()
@@ -34,7 +34,7 @@ export class StageTypeEntity implements StageType {
   name: string;
 
   @ApiProperty({
-    description: 'Stage type creation date and time',
+    description: 'Document type creation date and time',
     examples: [new Date('2024-01-03'), new Date('2023-11-02'), new Date('2023-06-30')],
     default: new Date('2024-01-03'),
   })
@@ -45,7 +45,7 @@ export class StageTypeEntity implements StageType {
   createdAt: Date;
 
   @ApiProperty({
-    description: 'Stage type last updated date and time',
+    description: 'Document type last updated date and time',
     examples: [new Date('2024-01-03'), new Date('2023-11-02'), new Date('2023-06-30')],
     default: new Date('2024-01-03'),
   })
@@ -55,6 +55,6 @@ export class StageTypeEntity implements StageType {
   @IsDefined()
   updatedAt: Date;
 
-  @ApiProperty({ description: 'The list of stages for the stage type' })
-  stages?: StageEntity[];
+  @ApiProperty({ description: 'The list of documents for the document type' })
+  documents?: DocumentEntity[];
 }

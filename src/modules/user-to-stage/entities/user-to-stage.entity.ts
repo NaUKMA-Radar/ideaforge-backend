@@ -38,7 +38,7 @@ export class UserToStageEntity implements UserToStage {
   userRoleId: number;
 
   @ApiProperty({
-    description: 'User to project creation date and time',
+    description: 'User to stage creation date and time',
     examples: [new Date('2024-01-03'), new Date('2023-11-02'), new Date('2023-06-30')],
     default: new Date('2024-01-03'),
   })
@@ -49,7 +49,7 @@ export class UserToStageEntity implements UserToStage {
   createdAt: Date;
 
   @ApiProperty({
-    description: 'User to project last updated date and time',
+    description: 'User to stage last updated date and time',
     examples: [new Date('2024-01-03'), new Date('2023-11-02'), new Date('2023-06-30')],
     default: new Date('2024-01-03'),
   })

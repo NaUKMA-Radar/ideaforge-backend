@@ -40,7 +40,7 @@ export enum Routes {
   Projects = 'projects',
   Stages = 'stages',
   StageTypes = 'stage-types',
-  Documets = 'documents',
+  Documents = 'documents',
   DocumentTypes = 'document-types',
   Paragraphs = 'paragraphs',
   Auth = 'auth',

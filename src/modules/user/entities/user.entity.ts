@@ -15,6 +15,7 @@ import {
   ValidateIf,
 } from 'class-validator';
 import { UserRegistrationMethodEntity } from 'src/modules/user-registration-method/entities/user-registration-method.enity';
+import { UserToDocumentEntity } from 'src/modules/user-to-document/entities/user-to-document.entity';
 import { UserToProjectEntity } from 'src/modules/user-to-project/entities/user-to-project.entity';
 import { UserToStageEntity } from 'src/modules/user-to-stage/entities/user-to-stage.entity';
 
@@ -146,4 +147,7 @@ export class UserEntity implements User {
 
   @ApiProperty({ description: 'The list of stages the user is member of' })
   usersToStages?: UserToStageEntity[];
+
+  @ApiProperty({ description: 'The list of documents the user is member of' })
+  usersToDocuments?: UserToDocumentEntity[];
 }
