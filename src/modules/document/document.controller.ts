@@ -105,7 +105,7 @@ export class DocumentController {
     schema: { example: '23fbed56-1bb9-40a0-8977-2dd0f0c6c31f' },
   })
   @Post(':id/paragraphs')
-  public async createDocument(
+  public async createParagraph(
     @Param('id') id: DocumentEntity['id'],
     @Body() createParagraphDto: CreateParagraphDto,
   ): Promise<ParagraphEntity> {
