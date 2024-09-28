@@ -1,6 +1,7 @@
-import { Body, Controller, Delete, Get, Param, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
 import {
   ApiConflictResponse,
+  ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
@@ -18,11 +19,17 @@ import { DocumentService } from 'src/modules/document/document.service';
 import { UpdateDocumentDto } from 'src/modules/document/DTO/update-document.dto';
 import { DocumentEntity } from 'src/modules/document/entities/document.entity';
 import * as _ from 'lodash';
+import { ParagraphService } from 'src/modules/paragraph/paragraph.service';
+import { ParagraphEntity } from 'src/modules/paragraph/entities/paragraph.entity';
+import { CreateParagraphDto } from 'src/modules/paragraph/DTO/create-paragraph.dto';
 
 @ApiTags(RoutesApiTags[Routes.Documents])
 @Controller(Routes.Documents)
 export class DocumentController {
-  constructor(private readonly documentService: DocumentService) {}
+  constructor(
+    private readonly documentService: DocumentService,
+    private readonly paragraphService: ParagraphService,
+  ) {}
 
   @Auth(JwtAuthGuard)
   @ApiOkResponse({ description: 'The document with requested id.', type: DocumentEntity })
@@ -77,5 +84,55 @@ export class DocumentController {
   @Delete(':id')
   public async remove(@Param('id') id: DocumentEntity['id']): Promise<DocumentEntity> {
     return this.documentService.remove(id);
+  }
+
+  @Auth(JwtAuthGuard)
+  @ApiCreatedResponse({
+    description: 'The paragraph for the document with specified id was successfully created.',
+    type: ParagraphEntity,
+  })
+  @ApiUnauthorizedResponse({ description: 'The user is unauthorized.' })
+  @ApiForbiddenResponse({ description: 'The user is forbidden to perform this action.' })
+  @ApiNotFoundResponse({ description: 'The document with the requested id was not found.' })
+  @ApiConflictResponse({
+    description:
+      'Cannot create the paragraph for the document with specified id. Invalid data was provided.',
+  })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error was occured.' })
+  @ApiParam({
+    name: 'id',
+    description: 'The id of the document to add new paragraph to',
+    schema: { example: '23fbed56-1bb9-40a0-8977-2dd0f0c6c31f' },
+  })
+  @Post(':id/paragraphs')
+  public async createDocument(
+    @Param('id') id: DocumentEntity['id'],
+    @Body() createParagraphDto: CreateParagraphDto,
+  ): Promise<ParagraphEntity> {
+    return this.paragraphService.create({ ...createParagraphDto, documentId: id });
+  }
+
+  @Auth(JwtAuthGuard)
+  @ApiOkResponse({
+    description: 'The list of paragraphs for the document with specified id',
+    type: [ParagraphEntity],
+  })
+  @ApiUnauthorizedResponse({ description: 'The user is unauthorized.' })
+  @ApiForbiddenResponse({ description: 'The user is forbidden to perform this action.' })
+  @ApiNotFoundResponse({ description: 'The document with the requested id was not found.' })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error was occured.' })
+  @ApiParam({
+    name: 'id',
+    description: 'The id of the document to get the list of paragraphs',
+    schema: { example: '23fbed56-1bb9-40a0-8977-2dd0f0c6c31f' },
+  })
+  @Get(':id/paragraphs')
+  public async findAllParagraphsByDocumentId(
+    @Param('id') id: DocumentEntity['id'],
+    @Query() query?: string,
+  ): Promise<ParagraphEntity[]> {
+    return this.paragraphService.findAll(
+      _.merge(deserializeQueryString(query), { where: { documentId: id } }),
+    );
   }
 }

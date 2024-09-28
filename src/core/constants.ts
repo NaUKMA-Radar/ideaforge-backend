@@ -10,6 +10,11 @@ export const RoutesApiTags = {
   [Routes.Documents]: 'Documents',
   [Routes.DocumentTypes]: 'Document types',
   [Routes.Paragraphs]: 'Paragraphs',
+  [Routes.ParagraphGrades]: 'Paragraph grades',
+  [Routes.ParagraphComments]: 'Paragraph comments',
+  [Routes.ParagraphEditions]: 'Paragraph editions',
+  [Routes.ParagraphEditionGrades]: 'Paragraph edition grades',
+  [Routes.ParagraphEditionComments]: 'Paragraph edition comments',
   [Routes.Auth]: 'Auth',
   [Routes.OAuth2]: 'OAuth2',
 };

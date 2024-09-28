@@ -43,6 +43,11 @@ export enum Routes {
   Documents = 'documents',
   DocumentTypes = 'document-types',
   Paragraphs = 'paragraphs',
+  ParagraphGrades = 'paragraph-grades',
+  ParagraphComments = 'paragraph-comments',
+  ParagraphEditions = 'paragraph-editions',
+  ParagraphEditionGrades = 'paragraph-edition-grades',
+  ParagraphEditionComments = 'paragraph-edition-comments',
   Auth = 'auth',
   OAuth2 = 'oauth2',
 }

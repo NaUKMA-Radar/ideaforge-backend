@@ -12,6 +12,7 @@ import {
   Min,
 } from 'class-validator';
 import { DocumentTypeEntity } from 'src/modules/document-type/entities/document-type.entity';
+import { ParagraphEntity } from 'src/modules/paragraph/entities/paragraph.entity';
 import { StageEntity } from 'src/modules/stage/entities/stage.entity';
 import { UserToDocumentEntity } from 'src/modules/user-to-document/entities/user-to-document.entity';
 
@@ -96,4 +97,7 @@ export class DocumentEntity implements Document {
 
   @ApiProperty({ description: 'The list of users in document' })
   usersToDocuments?: UserToDocumentEntity[];
+
+  @ApiProperty({ description: 'The list of paragraphs in document' })
+  paragraphs?: ParagraphEntity[];
 }
