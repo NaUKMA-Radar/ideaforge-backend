@@ -14,6 +14,7 @@ import {
   Min,
 } from 'class-validator';
 import { ParagraphEditionCommentEntity } from 'src/modules/paragraph-edition-comment/entities/paragraph-edition-comment.entity';
+import { ParagraphEditionGradeEntity } from 'src/modules/paragraph-edition-grade/entities/paragraph-edition-grade.entity';
 import { ParagraphEntity } from 'src/modules/paragraph/entities/paragraph.entity';
 
 export class ParagraphEditionEntity implements ParagraphEdition {
@@ -78,4 +79,7 @@ export class ParagraphEditionEntity implements ParagraphEdition {
 
   @ApiProperty({ description: 'The list of paragraph edition comments for paragraph edition' })
   paragraphEditionComments?: ParagraphEditionCommentEntity[];
+
+  @ApiProperty({ description: 'The list of paragraph edition grades for the paragraph edition' })
+  paragraphEditionGrades?: ParagraphEditionGradeEntity[];
 }
