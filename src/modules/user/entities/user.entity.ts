@@ -14,6 +14,10 @@ import {
   Min,
   ValidateIf,
 } from 'class-validator';
+import { ParagraphCommentEntity } from 'src/modules/paragraph-comment/entities/paragraph-comment.entity';
+import { ParagraphEditionCommentEntity } from 'src/modules/paragraph-edition-comment/entities/paragraph-edition-comment.entity';
+import { ParagraphEditionGradeEntity } from 'src/modules/paragraph-edition-grade/entities/paragraph-edition-grade.entity';
+import { ParagraphGradeEntity } from 'src/modules/paragraph-grade/entities/paragraph-grade.entity';
 import { UserRegistrationMethodEntity } from 'src/modules/user-registration-method/entities/user-registration-method.enity';
 import { UserToDocumentEntity } from 'src/modules/user-to-document/entities/user-to-document.entity';
 import { UserToProjectEntity } from 'src/modules/user-to-project/entities/user-to-project.entity';
@@ -150,4 +154,16 @@ export class UserEntity implements User {
 
   @ApiProperty({ description: 'The list of documents the user is member of' })
   usersToDocuments?: UserToDocumentEntity[];
+
+  @ApiProperty({ description: 'The list of paragraph comments of the user' })
+  paragraphComments?: ParagraphCommentEntity[];
+
+  @ApiProperty({ description: 'The list of paragraph edition comments of the user' })
+  paragraphEditionComments?: ParagraphEditionCommentEntity[];
+
+  @ApiProperty({ description: 'The list of paragraph grades of the user' })
+  paragraphGrades?: ParagraphGradeEntity[];
+
+  @ApiProperty({ description: 'The list of paragraph edition grades of the user' })
+  paragraphEditionGrades?: ParagraphEditionGradeEntity[];
 }

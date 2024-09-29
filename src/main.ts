@@ -5,6 +5,7 @@ import { configureCorsAllowedOriginsList } from './modules/app/utils/app.utils';
 import * as cookieParser from 'cookie-parser';
 import ValidationPipes from 'src/core/config/validation.pipes';
 import { AllExceptionFilter } from 'src/core/filters/exception.filter';
+import { configurePrismaDecimalJSONStringifyOutput } from 'src/core/utils/decimal.utils';
 
 const bootstrap = async () => {
   const app = await NestFactory.create(AppModule);
@@ -29,6 +30,8 @@ const bootstrap = async () => {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
+
+  configurePrismaDecimalJSONStringifyOutput();
 
   await app.listen(process.env.BACKEND_PORT || 8000);
 };

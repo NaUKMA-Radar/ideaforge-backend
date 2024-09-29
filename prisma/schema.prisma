@@ -183,7 +183,8 @@ model DocumentType {
 model Paragraph {
   id         String   @id @default(uuid()) @db.Uuid
   documentId String   @db.Uuid
-  content    String   @db.Text
+  content    String   @default("") @db.Text
+  rating     Decimal  @default(0) @db.Decimal()
   ordinalId  Int      @db.SmallInt
   isApproved Boolean  @default(false) @db.Boolean
   createdAt  DateTime @default(now()) @db.Timestamptz(6)
@@ -195,6 +196,7 @@ model Paragraph {
   paragraphGrades   ParagraphGrade[]
 
   @@index([documentId, isApproved])
+  @@unique([documentId, ordinalId])
 }
 
 model ParagraphComment {
@@ -232,6 +234,7 @@ model ParagraphEdition {
   id          String   @id @default(uuid()) @db.Uuid
   paragraphId String   @db.Uuid
   content     String   @db.Text
+  rating      Decimal  @default(0) @db.Decimal()
   createdAt   DateTime @default(now()) @db.Timestamptz(6)
   updatedAt   DateTime @updatedAt @db.Timestamptz(6)
 
