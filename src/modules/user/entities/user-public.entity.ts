@@ -16,6 +16,7 @@ import {
 } from 'class-validator';
 import { ParagraphCommentEntity } from 'src/modules/paragraph-comment/entities/paragraph-comment.entity';
 import { ParagraphEditionCommentEntity } from 'src/modules/paragraph-edition-comment/entities/paragraph-edition-comment.entity';
+import { ParagraphGradeEntity } from 'src/modules/paragraph-grade/entities/paragraph-grade.entity';
 import { UserToDocumentEntity } from 'src/modules/user-to-document/entities/user-to-document.entity';
 import { UserToProjectEntity } from 'src/modules/user-to-project/entities/user-to-project.entity';
 import { UserToStageEntity } from 'src/modules/user-to-stage/entities/user-to-stage.entity';
@@ -130,4 +131,7 @@ export class UserPublicEntity implements Omit<UserEntity, 'password' | 'refreshT
 
   @ApiProperty({ description: 'The list of paragraph edition comments of the user' })
   paragraphEditionComments?: ParagraphEditionCommentEntity[];
+
+  @ApiProperty({ description: 'The list of paragraph grades of the user' })
+  paragraphGrades?: ParagraphGradeEntity[];
 }

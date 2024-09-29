@@ -16,6 +16,7 @@ import {
 import { DocumentEntity } from 'src/modules/document/entities/document.entity';
 import { ParagraphCommentEntity } from 'src/modules/paragraph-comment/entities/paragraph-comment.entity';
 import { ParagraphEditionEntity } from 'src/modules/paragraph-edition/entities/paragraph-edition.entity';
+import { ParagraphGradeEntity } from 'src/modules/paragraph-grade/entities/paragraph-grade.entity';
 
 export class ParagraphEntity implements Paragraph {
   @ApiProperty({
@@ -102,4 +103,7 @@ export class ParagraphEntity implements Paragraph {
 
   @ApiProperty({ description: 'The list of paragraph comments for the paragraph' })
   paragraphComments?: ParagraphCommentEntity[];
+
+  @ApiProperty({ description: 'The list of paragraph grades for the paragraph' })
+  paragraphGrades?: ParagraphGradeEntity[];
 }

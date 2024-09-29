@@ -122,7 +122,13 @@ export class AuthService {
 
     await this.userService.update(user.id, { refreshToken });
 
-    return { ...user, accessToken, refreshToken };
+    const {
+      password: _password,
+      refreshToken: _refreshToken,
+      ...userWithoutPasswordAndRefreshToken
+    } = user;
+
+    return { ...userWithoutPasswordAndRefreshToken, accessToken, refreshToken };
   }
 
   public async loginWithGoogle(loginWithGoogleDto: LoginWithGoogleDto): Promise<LoginResponse> {
