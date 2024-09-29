@@ -4,7 +4,7 @@ import { Decimal } from '@prisma/client/runtime/library';
 import * as _ from 'lodash';
 import { ServerException } from 'src/core/exceptions/server.exception';
 import { CreateParagraphEditionDto } from 'src/modules/paragraph-edition/DTO/create-paragraph-edition.dto';
-import { UpdateParagraphEditionDto } from 'src/modules/paragraph-edition/DTO/update-entity-edition.dto';
+import { UpdateParagraphEditionDto } from 'src/modules/paragraph-edition/DTO/update-paragraph-edition.dto';
 import { ParagraphEditionEntity } from 'src/modules/paragraph-edition/entities/paragraph-edition.entity';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 

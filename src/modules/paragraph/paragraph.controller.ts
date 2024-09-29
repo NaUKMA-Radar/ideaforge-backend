@@ -22,6 +22,11 @@ import { UpdateParagraphDto } from 'src/modules/paragraph/DTO/update-paragraph.d
 import { CreateParagraphEditionDto } from 'src/modules/paragraph-edition/DTO/create-paragraph-edition.dto';
 import { ParagraphEditionService } from 'src/modules/paragraph-edition/paragraph-edition.service';
 import { ParagraphEditionEntity } from 'src/modules/paragraph-edition/entities/paragraph-edition.entity';
+import { ParagraphCommentEntity } from 'src/modules/paragraph-comment/entities/paragraph-comment.entity';
+import { ParagraphCommentService } from 'src/modules/paragraph-comment/paragraph-comment.service';
+import { CreateParagraphCommentDto } from 'src/modules/paragraph-comment/DTO/create-paragraph-comment.dto';
+import { AuthenticatedUser } from 'src/core/decorators/authenticated-user.decorator';
+import { UserPublicEntity } from 'src/modules/user/entities/user-public.entity';
 
 @ApiTags(RoutesApiTags[Routes.Paragraphs])
 @Controller(Routes.Paragraphs)
@@ -29,6 +34,7 @@ export class ParagraphController {
   constructor(
     private readonly paragraphService: ParagraphService,
     private readonly paragraphEditionService: ParagraphEditionService,
+    private readonly paragraphCommentService: ParagraphCommentService,
   ) {}
 
   @Auth(JwtAuthGuard)
@@ -133,6 +139,62 @@ export class ParagraphController {
     @Query() query?: string,
   ): Promise<ParagraphEditionEntity[]> {
     return this.paragraphEditionService.findAll(
+      _.merge(deserializeQueryString(query), { where: { paragraphId: id } }),
+    );
+  }
+
+  @Auth(JwtAuthGuard)
+  @ApiCreatedResponse({
+    description:
+      'The paragraph comment for the paragraph with specified id was successfully created.',
+    type: ParagraphCommentEntity,
+  })
+  @ApiUnauthorizedResponse({ description: 'The user is unauthorized.' })
+  @ApiForbiddenResponse({ description: 'The user is forbidden to perform this action.' })
+  @ApiNotFoundResponse({ description: 'The paragraph with the requested id was not found.' })
+  @ApiConflictResponse({
+    description:
+      'Cannot create the paragraph comment for the paragraph with specified id. Invalid data was provided.',
+  })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error was occured.' })
+  @ApiParam({
+    name: 'id',
+    description: 'The id of the paragraph to add new paragraph comment to',
+    schema: { example: '23fbed56-1bb9-40a0-8977-2dd0f0c6c31f' },
+  })
+  @Post(':id/comments')
+  public async createParagraphComment(
+    @Param('id') id: ParagraphEntity['id'],
+    @Body() createParagraphCommentDto: CreateParagraphCommentDto,
+    @AuthenticatedUser() user: UserPublicEntity,
+  ): Promise<ParagraphCommentEntity> {
+    return this.paragraphCommentService.create({
+      ...createParagraphCommentDto,
+      paragraphId: id,
+      authorId: user.id,
+    });
+  }
+
+  @Auth(JwtAuthGuard)
+  @ApiOkResponse({
+    description: 'The list of paragraph comments for the paragraph with specified id',
+    type: [ParagraphCommentEntity],
+  })
+  @ApiUnauthorizedResponse({ description: 'The user is unauthorized.' })
+  @ApiForbiddenResponse({ description: 'The user is forbidden to perform this action.' })
+  @ApiNotFoundResponse({ description: 'The paragraph with the requested id was not found.' })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error was occured.' })
+  @ApiParam({
+    name: 'id',
+    description: 'The id of the paragraph to get the list of paragraph comments',
+    schema: { example: '23fbed56-1bb9-40a0-8977-2dd0f0c6c31f' },
+  })
+  @Get(':id/comments')
+  public async findAllCommentsByParagraphId(
+    @Param('id') id: ParagraphEntity['id'],
+    @Query() query?: string,
+  ): Promise<ParagraphCommentEntity[]> {
+    return this.paragraphCommentService.findAll(
       _.merge(deserializeQueryString(query), { where: { paragraphId: id } }),
     );
   }
