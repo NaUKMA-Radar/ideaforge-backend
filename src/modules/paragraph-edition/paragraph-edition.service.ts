@@ -38,22 +38,22 @@ export class ParagraphEditionService {
         include: { paragraph: { select: { id: true, isApproved: true } } },
       });
 
-      const aggregations = await tx.paragraphEdition.aggregate({
-        where: { paragraphId: createdParagraphEdition.paragraphId },
-        _avg: { rating: true },
-      });
+      // const aggregations = await tx.paragraphGrade.aggregate({
+      //   where: { paragraphId: createdParagraphEdition.paragraphId },
+      //   _avg: { grade: true },
+      // });
 
-      if (!aggregations._avg.rating) {
-        throw new ServerException(
-          'Cannot update paragraph rating because _avg of paragraph edition ratings is null',
-        );
-      }
+      // if (!aggregations._avg.grade) {
+      //   throw new ServerException(
+      //     'Cannot update paragraph rating because _avg of paragraph grades is null',
+      //   );
+      // }
 
       await tx.paragraph.update({
         where: { id: createdParagraphEdition.paragraphId },
         data: {
           isApproved: false,
-          rating: aggregations._avg.rating,
+          // rating: aggregations._avg.grade,
           ...(createdParagraphEdition.paragraph.isApproved && {
             isApproved: false,
             paragraphGrades: { deleteMany: {} },
@@ -85,21 +85,21 @@ export class ParagraphEditionService {
         take: 1,
       });
 
-      const aggregations = await tx.paragraphEdition.aggregate({
-        where: { paragraphId: updatedParagraphEdition.paragraphId },
-        _avg: { rating: true },
-      });
+      // const aggregations = await tx.paragraphGrade.aggregate({
+      //   where: { paragraphId: updatedParagraphEdition.paragraphId },
+      //   _avg: { grade: true },
+      // });
 
-      if (!aggregations._avg.rating) {
-        throw new ServerException(
-          'Cannot update paragraph rating because _avg of paragraph edition ratings is null',
-        );
-      }
+      // if (!aggregations._avg.grade) {
+      //   throw new ServerException(
+      //     'Cannot update paragraph rating because _avg of paragraph grades is null',
+      //   );
+      // }
 
       await tx.paragraph.update({
         where: { id: updatedParagraphEdition.paragraphId },
         data: {
-          rating: aggregations._avg.rating,
+          // rating: aggregations._avg.grade,
           content: mostRatedParagraphEdition?.content || '',
           ...(updatedParagraphEdition.paragraph.isApproved && {
             isApproved: false,
@@ -128,21 +128,21 @@ export class ParagraphEditionService {
         take: 1,
       });
 
-      const aggregations = await tx.paragraphEdition.aggregate({
-        where: { paragraphId: removedParagraphEdition.paragraphId },
-        _avg: { rating: true },
-      });
+      // const aggregations = await tx.paragraphGrade.aggregate({
+      //   where: { paragraphId: removedParagraphEdition.paragraphId },
+      //   _avg: { grade: true },
+      // });
 
-      if (!aggregations._avg.rating) {
-        throw new ServerException(
-          'Cannot update paragraph rating because _avg of paragraph edition ratings is null',
-        );
-      }
+      // if (!aggregations._avg.grade) {
+      //   throw new ServerException(
+      //     'Cannot update paragraph rating because _avg of paragraph grades is null',
+      //   );
+      // }
 
       await tx.paragraph.update({
         where: { id: removedParagraphEdition.paragraphId },
         data: {
-          rating: aggregations._avg.rating,
+          // rating: aggregations._avg.grade,
           content: mostRatedParagraphEdition?.content || '',
           ...(removedParagraphEdition.paragraph.isApproved && {
             isApproved: false,
