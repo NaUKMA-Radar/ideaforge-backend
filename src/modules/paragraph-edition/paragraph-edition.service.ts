@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import * as _ from 'lodash';
-import { ServerException } from 'src/core/exceptions/server.exception';
 import { CreateParagraphEditionDto } from 'src/modules/paragraph-edition/DTO/create-paragraph-edition.dto';
 import { UpdateParagraphEditionDto } from 'src/modules/paragraph-edition/DTO/update-paragraph-edition.dto';
 import { ParagraphEditionEntity } from 'src/modules/paragraph-edition/entities/paragraph-edition.entity';
@@ -34,32 +33,20 @@ export class ParagraphEditionService {
         data: {
           ...data,
           paragraphId: data.paragraphId || '',
+          authorId: data.authorId || '',
         },
         include: { paragraph: { select: { id: true, isApproved: true } } },
       });
 
-      // const aggregations = await tx.paragraphGrade.aggregate({
-      //   where: { paragraphId: createdParagraphEdition.paragraphId },
-      //   _avg: { grade: true },
-      // });
-
-      // if (!aggregations._avg.grade) {
-      //   throw new ServerException(
-      //     'Cannot update paragraph rating because _avg of paragraph grades is null',
-      //   );
-      // }
-
-      await tx.paragraph.update({
-        where: { id: createdParagraphEdition.paragraphId },
-        data: {
-          isApproved: false,
-          // rating: aggregations._avg.grade,
-          ...(createdParagraphEdition.paragraph.isApproved && {
+      if (createdParagraphEdition.paragraph.isApproved) {
+        await tx.paragraph.update({
+          where: { id: createdParagraphEdition.paragraphId },
+          data: {
             isApproved: false,
             paragraphGrades: { deleteMany: {} },
-          }),
-        },
-      });
+          },
+        });
+      }
 
       const { paragraph, ...createdParagraphEditionWithoutParagraph } = createdParagraphEdition;
 
@@ -78,35 +65,15 @@ export class ParagraphEditionService {
         include: { paragraph: { select: { isApproved: true } } },
       });
 
-      const mostRatedParagraphEdition = await tx.paragraphEdition.findFirst({
-        where: { paragraphId: updatedParagraphEdition.paragraphId },
-        select: { content: true },
-        orderBy: { rating: 'desc', updatedAt: 'desc' },
-        take: 1,
-      });
-
-      // const aggregations = await tx.paragraphGrade.aggregate({
-      //   where: { paragraphId: updatedParagraphEdition.paragraphId },
-      //   _avg: { grade: true },
-      // });
-
-      // if (!aggregations._avg.grade) {
-      //   throw new ServerException(
-      //     'Cannot update paragraph rating because _avg of paragraph grades is null',
-      //   );
-      // }
-
-      await tx.paragraph.update({
-        where: { id: updatedParagraphEdition.paragraphId },
-        data: {
-          // rating: aggregations._avg.grade,
-          content: mostRatedParagraphEdition?.content || '',
-          ...(updatedParagraphEdition.paragraph.isApproved && {
+      if (updatedParagraphEdition.paragraph.isApproved) {
+        await tx.paragraph.update({
+          where: { id: updatedParagraphEdition.paragraphId },
+          data: {
             isApproved: false,
             paragraphGrades: { deleteMany: {} },
-          }),
-        },
-      });
+          },
+        });
+      }
 
       const { paragraph, ...updatedParagraphEditionWithoutParagraph } = updatedParagraphEdition;
 
@@ -128,21 +95,9 @@ export class ParagraphEditionService {
         take: 1,
       });
 
-      // const aggregations = await tx.paragraphGrade.aggregate({
-      //   where: { paragraphId: removedParagraphEdition.paragraphId },
-      //   _avg: { grade: true },
-      // });
-
-      // if (!aggregations._avg.grade) {
-      //   throw new ServerException(
-      //     'Cannot update paragraph rating because _avg of paragraph grades is null',
-      //   );
-      // }
-
       await tx.paragraph.update({
         where: { id: removedParagraphEdition.paragraphId },
         data: {
-          // rating: aggregations._avg.grade,
           content: mostRatedParagraphEdition?.content || '',
           ...(removedParagraphEdition.paragraph.isApproved && {
             isApproved: false,

@@ -17,6 +17,7 @@ import {
 import { ParagraphCommentEntity } from 'src/modules/paragraph-comment/entities/paragraph-comment.entity';
 import { ParagraphEditionCommentEntity } from 'src/modules/paragraph-edition-comment/entities/paragraph-edition-comment.entity';
 import { ParagraphEditionGradeEntity } from 'src/modules/paragraph-edition-grade/entities/paragraph-edition-grade.entity';
+import { ParagraphEditionEntity } from 'src/modules/paragraph-edition/entities/paragraph-edition.entity';
 import { ParagraphGradeEntity } from 'src/modules/paragraph-grade/entities/paragraph-grade.entity';
 import { UserToDocumentEntity } from 'src/modules/user-to-document/entities/user-to-document.entity';
 import { UserToProjectEntity } from 'src/modules/user-to-project/entities/user-to-project.entity';
@@ -129,6 +130,9 @@ export class UserPublicEntity implements Omit<UserEntity, 'password' | 'refreshT
 
   @ApiProperty({ description: 'The list of paragraph comments of the user' })
   paragraphComments?: ParagraphCommentEntity[];
+
+  @ApiProperty({ description: 'The list of paragraph editions of the user' })
+  paragraphEditions?: ParagraphEditionEntity[];
 
   @ApiProperty({ description: 'The list of paragraph edition comments of the user' })
   paragraphEditionComments?: ParagraphEditionCommentEntity[];

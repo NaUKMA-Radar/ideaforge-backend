@@ -7,9 +7,11 @@ import {
   IsDefined,
   IsNotEmpty,
   IsNumber,
+  IsString,
   IsUUID,
   MaxDate,
   Min,
+  ValidateIf,
 } from 'class-validator';
 import { DocumentTypeEntity } from 'src/modules/document-type/entities/document-type.entity';
 import { ParagraphEntity } from 'src/modules/paragraph/entities/paragraph.entity';
@@ -48,6 +50,11 @@ export class DocumentEntity implements Document {
   @IsDefined()
   documentTypeId: number;
 
+  @ApiProperty({ description: 'The path to the file of the document' })
+  @IsString()
+  @ValidateIf((_, value) => value)
+  file: string | null;
+  
   @ApiProperty({
     description: 'Document is finalized',
     examples: [true, false],

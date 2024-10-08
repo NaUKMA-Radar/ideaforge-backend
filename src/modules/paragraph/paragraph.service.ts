@@ -23,14 +23,14 @@ export class ParagraphService {
   }
 
   public async create(data: CreateParagraphDto): Promise<ParagraphEntity> {
-    const { content, ...otherData } = data;
+    const { content, authorId, ...otherData } = data;
 
     return this.prismaService.paragraph.create({
       data: {
         ...otherData,
         content,
         documentId: otherData.documentId || '',
-        paragraphEditions: { create: { content } },
+        paragraphEditions: { create: { authorId: authorId || '', content } },
       },
     });
   }

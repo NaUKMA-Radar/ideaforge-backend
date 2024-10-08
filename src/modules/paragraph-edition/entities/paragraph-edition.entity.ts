@@ -16,6 +16,7 @@ import {
 import { ParagraphEditionCommentEntity } from 'src/modules/paragraph-edition-comment/entities/paragraph-edition-comment.entity';
 import { ParagraphEditionGradeEntity } from 'src/modules/paragraph-edition-grade/entities/paragraph-edition-grade.entity';
 import { ParagraphEntity } from 'src/modules/paragraph/entities/paragraph.entity';
+import { UserPublicEntity } from 'src/modules/user/entities/user-public.entity';
 
 export class ParagraphEditionEntity implements ParagraphEdition {
   @ApiProperty({
@@ -37,6 +38,16 @@ export class ParagraphEditionEntity implements ParagraphEdition {
   @IsNotEmpty()
   @IsDefined()
   paragraphId: string;
+
+  @ApiProperty({
+    description: 'The UUID of the author of the paragraph edition',
+    examples: ['b7af9cd4-5533-4737-862b-78bce985c987', '989d32c2-abd4-43d3-a420-ee175ae16b98'],
+    default: '8jg8nf81-6157-jg84-lfa4-gjn95m19gka3',
+  })
+  @IsUUID()
+  @IsNotEmpty()
+  @IsDefined()
+  authorId: string;
 
   @ApiProperty({ description: 'Paragraph edition rating' })
   @IsNumber()
@@ -76,6 +87,9 @@ export class ParagraphEditionEntity implements ParagraphEdition {
 
   @ApiProperty({ description: 'Paragraph edition paragraph nested object' })
   paragraph?: ParagraphEntity | null;
+
+  @ApiProperty({ description: 'Author nested object' })
+  author?: UserPublicEntity | null;
 
   @ApiProperty({ description: 'The list of paragraph edition comments for paragraph edition' })
   paragraphEditionComments?: ParagraphEditionCommentEntity[];

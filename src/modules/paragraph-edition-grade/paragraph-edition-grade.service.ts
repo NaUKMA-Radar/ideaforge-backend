@@ -50,10 +50,46 @@ export class ParagraphEditionGradeService {
         );
       }
 
-      await tx.paragraphEdition.update({
+      const updatedParagraphEdition = await tx.paragraphEdition.update({
         where: { id: createdParagraphEditionGrade.paragraphEditionId },
         data: { rating: aggregations._avg.grade },
       });
+
+      const mostRatedParagraphEdition = await tx.paragraphEdition.findFirst({
+        where: { paragraphId: updatedParagraphEdition.paragraphId },
+        select: {
+          id: true,
+          content: true,
+          rating: true,
+          paragraphEditionGrades: { orderBy: { updatedAt: 'desc' } },
+        },
+        orderBy: [{ rating: 'desc' }, { updatedAt: 'desc' }],
+        take: 1,
+      });
+
+      if (mostRatedParagraphEdition?.id === updatedParagraphEdition.id) {
+        await tx.paragraph.update({
+          where: { id: updatedParagraphEdition.paragraphId },
+          data: {
+            content: mostRatedParagraphEdition?.content || updatedParagraphEdition.content,
+            rating: mostRatedParagraphEdition?.rating || updatedParagraphEdition.rating,
+          },
+        });
+
+        if (mostRatedParagraphEdition) {
+          await tx.paragraphGrade.deleteMany({
+            where: { paragraphId: updatedParagraphEdition.paragraphId },
+          });
+
+          await tx.paragraphGrade.createMany({
+            data: mostRatedParagraphEdition.paragraphEditionGrades.map(({ grade, userId }) => ({
+              grade,
+              userId,
+              paragraphId: updatedParagraphEdition.paragraphId,
+            })),
+          });
+        }
+      }
 
       return createdParagraphEditionGrade;
     });
@@ -81,10 +117,46 @@ export class ParagraphEditionGradeService {
         );
       }
 
-      await tx.paragraphEdition.update({
+      const updatedParagraphEdition = await tx.paragraphEdition.update({
         where: { id: updatedParagraphEditionGrade.paragraphEditionId },
         data: { rating: aggregations._avg.grade },
       });
+
+      const mostRatedParagraphEdition = await tx.paragraphEdition.findFirst({
+        where: { paragraphId: updatedParagraphEdition.paragraphId },
+        select: {
+          id: true,
+          content: true,
+          rating: true,
+          paragraphEditionGrades: { orderBy: { updatedAt: 'desc' } },
+        },
+        orderBy: [{ rating: 'desc' }, { updatedAt: 'desc' }],
+        take: 1,
+      });
+
+      if (mostRatedParagraphEdition?.id === updatedParagraphEdition.id) {
+        await tx.paragraph.update({
+          where: { id: updatedParagraphEdition.paragraphId },
+          data: {
+            content: mostRatedParagraphEdition?.content || updatedParagraphEdition.content,
+            rating: mostRatedParagraphEdition?.rating || updatedParagraphEdition.rating,
+          },
+        });
+
+        if (mostRatedParagraphEdition) {
+          await tx.paragraphGrade.deleteMany({
+            where: { paragraphId: updatedParagraphEdition.paragraphId },
+          });
+
+          await tx.paragraphGrade.createMany({
+            data: mostRatedParagraphEdition.paragraphEditionGrades.map(({ grade, userId }) => ({
+              grade,
+              userId,
+              paragraphId: updatedParagraphEdition.paragraphId,
+            })),
+          });
+        }
+      }
 
       return updatedParagraphEditionGrade;
     });
@@ -100,20 +172,50 @@ export class ParagraphEditionGradeService {
       });
 
       const aggregations = await tx.paragraphEditionGrade.aggregate({
-        where: { paragraphEditionId: removedParagraphEditionGrade.paragraphEditionId },
+        where: { paragraphEditionId },
         _avg: { grade: true },
       });
 
-      if (!aggregations._avg.grade) {
-        throw new ServerException(
-          'Cannot update paragraph edition rating because _avg of paragraph edition grades is null',
-        );
-      }
-
-      await tx.paragraphEdition.update({
+      const updatedParagraphEdition = await tx.paragraphEdition.update({
         where: { id: removedParagraphEditionGrade.paragraphEditionId },
-        data: { rating: aggregations._avg.grade },
+        data: { rating: aggregations._avg.grade || 0 },
       });
+
+      const mostRatedParagraphEdition = await tx.paragraphEdition.findFirst({
+        where: { paragraphId: updatedParagraphEdition.paragraphId },
+        select: {
+          id: true,
+          content: true,
+          rating: true,
+          paragraphEditionGrades: { orderBy: { updatedAt: 'desc' } },
+        },
+        orderBy: [{ rating: 'desc' }, { updatedAt: 'desc' }],
+        take: 1,
+      });
+
+      if (mostRatedParagraphEdition?.id === updatedParagraphEdition.id) {
+        await tx.paragraph.update({
+          where: { id: updatedParagraphEdition.paragraphId },
+          data: {
+            content: mostRatedParagraphEdition?.content || updatedParagraphEdition.content,
+            rating: mostRatedParagraphEdition?.rating || updatedParagraphEdition.rating,
+          },
+        });
+
+        if (mostRatedParagraphEdition) {
+          await tx.paragraphGrade.deleteMany({
+            where: { paragraphId: updatedParagraphEdition.paragraphId },
+          });
+
+          await tx.paragraphGrade.createMany({
+            data: mostRatedParagraphEdition.paragraphEditionGrades.map(({ grade, userId }) => ({
+              grade,
+              userId,
+              paragraphId: updatedParagraphEdition.paragraphId,
+            })),
+          });
+        }
+      }
 
       return removedParagraphEditionGrade;
     });
