@@ -26,6 +26,8 @@ export enum ConfigVariables {
   JwtAudience = 'JWT_AUDIENCE',
   GoogleClientId = 'GOOGLE_CLIENT_ID',
   GoogleClientSecret = 'GOOGLE_CLIENT_SECRET',
+  OpenAIApiKey = 'OPENAI_API_KEY',
+  OpenAIModel = 'OPENAI_MODEL',
 }
 
 export enum UserRegistrationMethods {

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { parseFromString } from 'dom-parser';
 import * as _ from 'lodash';
 import * as path from 'path';
 import { Routes } from 'src/core/enums/app.enums';
@@ -7,6 +8,9 @@ import { CreateDocumentDto } from 'src/modules/document/DTO/create-document.dto'
 import { UpdateDocumentDto } from 'src/modules/document/DTO/update-document.dto';
 import { DocumentEntity } from 'src/modules/document/entities/document.entity';
 import { UpdateDocumentUploadedFiles } from 'src/modules/document/types/document.types';
+import { OpenAIService } from 'src/modules/openai/openai.service';
+import { OPENAI_SPLIT_DOCUMENT_BY_PARAGRAPHS_SYSTEM_MESSAGE } from 'src/modules/openai/utils/constants';
+import { ParagraphEntity } from 'src/modules/paragraph/entities/paragraph.entity';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { SupabaseService } from 'src/modules/supabase/supabase.service';
 import { v4 as uuid } from 'uuid';
@@ -16,6 +20,7 @@ export class DocumentService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly supabaseService: SupabaseService,
+    private readonly openAIService: OpenAIService,
   ) {}
 
   public async findAll(options?: Prisma.DocumentFindManyArgs): Promise<DocumentEntity[]> {
@@ -31,19 +36,42 @@ export class DocumentService {
   }
 
   public async create(data: CreateDocumentDto): Promise<DocumentEntity> {
-    const { usersToAdd, ...otherData } = data;
+    const { usersToAdd, authorId, ...otherData } = data;
 
-    return this.prismaService.document.create({
-      data: {
-        ...otherData,
-        stageId: data.stageId || '',
-        initialData: !otherData.initialData ? {} : otherData.initialData,
-        usersToDocuments: {
-          createMany: {
-            data: usersToAdd || [],
+    const paragraphs = await this.splitByParagraphs(JSON.stringify(otherData.initialData || ''));
+
+    return this.prismaService.$transaction(async tx => {
+      const document = await tx.document.create({
+        data: {
+          ...otherData,
+          stageId: data.stageId || '',
+          initialData: !otherData.initialData ? {} : otherData.initialData,
+          usersToDocuments: {
+            createMany: {
+              data: usersToAdd || [],
+            },
           },
         },
-      },
+      });
+
+      await Promise.all(
+        paragraphs.map(paragraph =>
+          tx.paragraph.create({
+            data: {
+              ...paragraph,
+              documentId: document.id,
+              paragraphEditions: {
+                create: {
+                  authorId: authorId || '',
+                  content: paragraph.content,
+                },
+              },
+            },
+          }),
+        ),
+      );
+
+      return document;
     });
   }
 
@@ -117,5 +145,20 @@ export class DocumentService {
 
   public async remove(id: DocumentEntity['id']): Promise<DocumentEntity> {
     return this.prismaService.document.delete({ where: { id } });
+  }
+
+  private async splitByParagraphs(
+    data: string,
+  ): Promise<Pick<ParagraphEntity, 'content' | 'ordinalId'>[]> {
+    const response = await this.openAIService.ask(
+      data,
+      OPENAI_SPLIT_DOCUMENT_BY_PARAGRAPHS_SYSTEM_MESSAGE,
+    );
+    const content = response.choices[0].message.content || '';
+
+    const document = parseFromString(content);
+    const paragraphs = document.getElementsByTagName('block');
+
+    return paragraphs.map((paragraph, id) => ({ content: paragraph.innerHTML, ordinalId: id + 1 }));
   }
 }

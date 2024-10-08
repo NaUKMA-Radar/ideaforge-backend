@@ -22,6 +22,8 @@ import * as _ from 'lodash';
 import { DocumentService } from 'src/modules/document/document.service';
 import { DocumentEntity } from 'src/modules/document/entities/document.entity';
 import { CreateDocumentDto } from 'src/modules/document/DTO/create-document.dto';
+import { AuthenticatedUser } from 'src/core/decorators/authenticated-user.decorator';
+import { UserPublicEntity } from 'src/modules/user/entities/user-public.entity';
 
 @ApiTags(RoutesApiTags[Routes.Stages])
 @Controller(Routes.Stages)
@@ -108,8 +110,9 @@ export class StageController {
   public async createDocument(
     @Param('id') id: StageEntity['id'],
     @Body() createDocumentDto: CreateDocumentDto,
+    @AuthenticatedUser() user: UserPublicEntity,
   ): Promise<DocumentEntity> {
-    return this.documentService.create({ ...createDocumentDto, stageId: id });
+    return this.documentService.create({ ...createDocumentDto, stageId: id, authorId: user.id });
   }
 
   @Auth(JwtAuthGuard)

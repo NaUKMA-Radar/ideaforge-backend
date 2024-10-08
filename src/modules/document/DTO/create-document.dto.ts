@@ -20,6 +20,15 @@ export class CreateDocumentDto
   stageId?: string;
 
   @ApiProperty({
+    description: 'The UUID of the author of the document',
+    examples: ['b7af9cd4-5533-4737-862b-78bce985c987', '989d32c2-abd4-43d3-a420-ee175ae16b98'],
+    default: '989d32c2-abd4-43d3-a420-ee175ae16b98',
+  })
+  @IsUUID()
+  @ValidateIf((_, value) => value)
+  authorId?: string;
+
+  @ApiProperty({
     description: 'Document type id',
     examples: [1, 2, 3, 4, 5],
     default: 1,

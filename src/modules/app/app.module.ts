@@ -4,6 +4,8 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigVariables } from 'src/core/enums/app.enums';
 import { AuthModule } from 'src/modules/auth/auth.module';
+import { OpenAIModule } from 'src/modules/openai/openai.module';
+import { OpenAIModuleOptions } from 'src/modules/openai/types/openai.types';
 import { PasswordModule } from 'src/modules/password/password.module';
 import { PasswordModuleOptions } from 'src/modules/password/types/password.types';
 import { PrismaModule } from 'src/modules/prisma/prisma.module';
@@ -51,6 +53,12 @@ import { UserModule } from 'src/modules/user/user.module';
         saltRounds: configService.get<number>(ConfigVariables.UserPasswordSaltRounds) || 0,
       }),
       inject: [ConfigService],
+    }),
+    OpenAIModule.registerAsync({
+      useFactory: async (configService: ConfigService): Promise<OpenAIModuleOptions> => ({
+        openAIApiKey: configService.get<string>(ConfigVariables.OpenAIApiKey) || '',
+        openAIModel: configService.get<string>(ConfigVariables.OpenAIModel) || '',
+      }),
     }),
     UserModule,
     AuthModule,
