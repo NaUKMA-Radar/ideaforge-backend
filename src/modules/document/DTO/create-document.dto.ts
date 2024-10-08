@@ -27,6 +27,7 @@ export class CreateDocumentDto
   @Min(1)
   @IsNumber()
   @IsNotEmpty()
+  @Transform(({ value }) => Number(value))
   @IsDefined()
   documentTypeId: number;
 

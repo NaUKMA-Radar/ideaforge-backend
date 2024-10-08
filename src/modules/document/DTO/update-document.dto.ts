@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { JsonValue } from '@prisma/client/runtime/library';
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsNumber, IsUUID, Min, ValidateIf } from 'class-validator';
+import { IsBoolean, IsNumber, IsString, IsUUID, Min, ValidateIf } from 'class-validator';
 import { DocumentEntity } from 'src/modules/document/entities/document.entity';
 import { CreateUserToDocumentDto } from 'src/modules/user-to-document/DTO/create-user-to-document.dto';
 import { UpdateUserToDocumentDto } from 'src/modules/user-to-document/DTO/update-user-to-document.dto';
@@ -9,7 +9,10 @@ import { UserToDocumentEntity } from 'src/modules/user-to-document/entities/user
 
 export class UpdateDocumentDto
   implements
-    Pick<Partial<DocumentEntity>, 'stageId' | 'documentTypeId' | 'isFinalized' | 'initialData'>
+    Pick<
+      Partial<DocumentEntity>,
+      'stageId' | 'documentTypeId' | 'file' | 'isFinalized' | 'initialData'
+    >
 {
   @ApiProperty({
     description: 'The UUID of the stage of the document',
@@ -27,14 +30,21 @@ export class UpdateDocumentDto
   })
   @Min(1)
   @IsNumber()
+  @Transform(({ value }) => Number(value))
   @ValidateIf((_, value) => value)
   documentTypeId?: number;
+
+  @ApiProperty({ description: 'The path to the file of the document' })
+  @IsString()
+  @ValidateIf((_, value) => value)
+  file?: string | null;
 
   @ApiProperty({
     description: 'Document is finalized',
     examples: [true, false],
     default: false,
   })
+  @Transform(({ value }) => Boolean(value))
   @IsBoolean()
   isFinalized?: boolean;
 
@@ -43,6 +53,7 @@ export class UpdateDocumentDto
     examples: [[{ question: 'What is your name?', answer: 'Oleksandr' }]],
     default: [{ question: 'What is your name?', answer: 'Oleksandr' }],
   })
+  @Transform(({ value }) => JSON.parse(value))
   @ValidateIf((_, value) => value)
   initialData?: JsonValue;
 

@@ -1,6 +1,18 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  UploadedFiles,
+  UseInterceptors,
+} from '@nestjs/common';
 import {
   ApiConflictResponse,
+  ApiConsumes,
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
@@ -22,6 +34,11 @@ import * as _ from 'lodash';
 import { ParagraphService } from 'src/modules/paragraph/paragraph.service';
 import { ParagraphEntity } from 'src/modules/paragraph/entities/paragraph.entity';
 import { CreateParagraphDto } from 'src/modules/paragraph/DTO/create-paragraph.dto';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { UploadRestrictions } from 'src/core/decorators/upload-restrictions.decorator';
+import { UpdateDocumentUploadedFiles } from 'src/modules/document/types/document.types';
+import { AuthenticatedUser } from 'src/core/decorators/authenticated-user.decorator';
+import { UserPublicEntity } from 'src/modules/user/entities/user-public.entity';
 
 @ApiTags(RoutesApiTags[Routes.Documents])
 @Controller(Routes.Documents)
@@ -62,12 +79,17 @@ export class DocumentController {
     description: 'The uuid of the document to be updated',
     schema: { example: '23fbed56-1bb9-40a0-8977-2dd0f0c6c31f' },
   })
+  @ApiConsumes('application/json', 'multipart/form-data')
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'file', maxCount: 1 }]))
   @Put(':id')
   public async update(
     @Param('id') id: DocumentEntity['id'],
     @Body() updateDocumentDto: UpdateDocumentDto,
+    @UploadedFiles()
+    @UploadRestrictions([{ fieldname: 'file', minFileSize: 1 }])
+    files: UpdateDocumentUploadedFiles,
   ): Promise<DocumentEntity> {
-    return this.documentService.update(id, updateDocumentDto);
+    return this.documentService.update(id, updateDocumentDto, files);
   }
 
   @Auth(JwtAuthGuard)
@@ -108,8 +130,13 @@ export class DocumentController {
   public async createParagraph(
     @Param('id') id: DocumentEntity['id'],
     @Body() createParagraphDto: CreateParagraphDto,
+    @AuthenticatedUser() user: UserPublicEntity,
   ): Promise<ParagraphEntity> {
-    return this.paragraphService.create({ ...createParagraphDto, documentId: id });
+    return this.paragraphService.create({
+      ...createParagraphDto,
+      documentId: id,
+      authorId: user.id,
+    });
   }
 
   @Auth(JwtAuthGuard)

@@ -120,8 +120,13 @@ export class ParagraphController {
   public async createParagraphEdition(
     @Param('id') id: ParagraphEntity['id'],
     @Body() createParagraphEditionDto: CreateParagraphEditionDto,
+    @AuthenticatedUser() user: UserPublicEntity,
   ): Promise<ParagraphEditionEntity> {
-    return this.paragraphEditionService.create({ ...createParagraphEditionDto, paragraphId: id });
+    return this.paragraphEditionService.create({
+      ...createParagraphEditionDto,
+      paragraphId: id,
+      authorId: user.id,
+    });
   }
 
   @Auth(JwtAuthGuard)
